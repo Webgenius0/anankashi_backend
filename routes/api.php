@@ -66,7 +66,7 @@ Route::get('dynamic/page/show/{slug}', [PageController::class, 'show']);
 Route::group(['middleware' => 'guest:api'], function ($router) {
     //register
     Route::post('register', [RegisterController::class, 'register']);
-    Route::post('/verify-email', [RegisterController::class, 'VerifyEmail']);
+    Route::GET('/verify-email', [RegisterController::class, 'VerifyEmail'])->name('verify.email');
     Route::post('/resend-otp', [RegisterController::class, 'ResendOtp']);
     Route::post('/verify-otp', [RegisterController::class, 'VerifyEmail']);
     //login

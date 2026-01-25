@@ -17,6 +17,8 @@ class User extends Authenticatable implements JWTSubject
 
     protected $guard_name = ['api', 'web'];
 
+    protected $guarded = [];
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -154,5 +156,5 @@ class User extends Authenticatable implements JWTSubject
     {
         return Room::where('user_one_id', $this->id)->orWhere('user_two_id', $this->id);
     }
-    
+
 }
