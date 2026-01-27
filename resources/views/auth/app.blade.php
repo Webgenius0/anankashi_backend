@@ -52,7 +52,6 @@ $settings = \App\Models\Setting::first();
 
     @include('backend.partials._switcher')
 
-    @include('backend.partials._loader')
 
     <!-- Switcher Icon-->
     <span class="demo-icon">
@@ -62,7 +61,7 @@ $settings = \App\Models\Setting::first();
     </span>
 
     <!-- PAGE -->
-    <div class="page">
+    <div class="">
         <div class="">
             @yield('content')
         </div>
