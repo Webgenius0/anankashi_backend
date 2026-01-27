@@ -27,7 +27,7 @@
                             </p>
 
                             <p style="margin:24px 0; color:#5a6c7d; font-size:16px; line-height:1.6; text-align:center; max-width:520px;">
-                                Thank you for registering your school account. To complete your registration and access all features, please verify your email address by clicking the button below.
+                                Thank you for registering your {{ config('app.name') }}. To complete your registration and access all features, please verify your email address by clicking the button below.
                             </p>
 
                             <!-- Button -->
@@ -54,19 +54,7 @@
                             </table>
 
                             <!-- Support Info -->
-                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-top:40px; padding-top:24px; border-top:1px solid #eaeaea;">
-                                <tr>
-                                    <td align="center">
-                                        <p style="margin:0 0 12px; color:#7b8a9b; font-size:14px; text-align:center;">
-                                            Need assistance?
-                                        </p>
-                                        <a href="mailto:support@{{ parse_url(config('app.url'), PHP_URL_HOST) }}"
-                                            style="color:#4a90e2; text-decoration:none; font-size:14px; font-weight:500;">
-                                            Contact Support
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+
                         </td>
                     </tr>
 

@@ -15,23 +15,29 @@ class UserController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->select = ['id', 'name', 'email', 'avatar', 'otp_verified_at', 'last_activity_at'];   
+        $this->select = ['id', 'first_name', 'last_name','phone','company_name','Chamber_of_Commerce_kvk_number','Chamber_of_Commerce', 'email', 'avatar', 'gender', 'dob', 'country', 'address'];
     }
 
     public function me()
-    {   
-        $data = User::select($this->select)->with('roles')->find(auth('api')->user()->id);     
+    {
+        $data = User::select($this->select)->find(auth('api')->user()->id);
         return Helper::jsonResponse(true, 'User details fetched successfully', 200, $data);
     }
 
     public function updateProfile(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:100',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
-            'phone' => 'required|string|numeric|max_digits:20',
             'password' => 'nullable|string|min:6|confirmed',
             'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'Chamber_of_Commerce' => 'nullable|string|max:255',
+            'Chamber_of_Commerce_kvk_number' => 'nullable|string|max:255',
+            'gender' => 'nullable|string|max:255',
+            'dob' => 'nullable|date',
+            'country' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'company_name' => 'nullable|string|max:255',
         ]);
 
         if (!empty($validatedData['password'])) {
@@ -53,7 +59,7 @@ class UserController extends Controller
 
         $user->update($validatedData);
 
-        $data = User::select($this->select)->with('roles')->find($user->id);
+        $data = User::select($this->select)->find($user->id);
         return Helper::jsonResponse(true, 'Profile updated successfully', 200, $data);
     }
 
@@ -68,7 +74,7 @@ class UserController extends Controller
         }
         $validatedData['avatar'] = Helper::fileUpload($request->file('avatar'), 'user/avatar', getFileName($request->file('avatar')));
         $user->update($validatedData);
-        $data = User::select($this->select)->with('roles')->find($user->id);
+        $data = User::select($this->select)->find($user->id);
         return Helper::jsonResponse(true, 'Avatar updated successfully', 200, $data);
     }
 
@@ -93,5 +99,5 @@ class UserController extends Controller
         $user->forceDelete();
         return Helper::jsonResponse(true, 'Profile deleted successfully', 200);
     }
-    
+
 }

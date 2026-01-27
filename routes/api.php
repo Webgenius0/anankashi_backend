@@ -67,7 +67,7 @@ Route::group(['middleware' => 'guest:api'], function ($router) {
     //register
     Route::post('register', [RegisterController::class, 'register']);
     Route::GET('/verify-email', [RegisterController::class, 'VerifyEmail'])->name('verify.email');
-    Route::post('/resend-otp', [RegisterController::class, 'ResendOtp']);
+    Route::post('/resend-email', [RegisterController::class, 'ResendOtp']);
     Route::post('/verify-otp', [RegisterController::class, 'VerifyEmail']);
     //login
     Route::post('login', [LoginController::class, 'login'])->name('api.login');
@@ -87,6 +87,7 @@ Route::group(['middleware' => ['auth:api', 'api-otp']], function ($router) {
     Route::post('/update-profile', [UserController::class, 'updateProfile']);
     Route::post('/update-avatar', [UserController::class, 'updateAvatar']);
     Route::delete('/delete-profile', [UserController::class, 'destroy']);
+    Route::POST('/update-password', [ResetPasswordController::class, 'password_update']);
 });
 
 /*

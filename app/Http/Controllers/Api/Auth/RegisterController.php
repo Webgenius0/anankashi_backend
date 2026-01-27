@@ -36,22 +36,24 @@ class RegisterController extends Controller
         DB::beginTransaction();
 
         $validatedData = $request->validate([
-            'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:6|confirmed',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
         ]);
         try {
 
             $verificationToken = Str::random(64);
 
             $user = User::create([
-                'name'               => $validatedData['name'],
-                'email'              => $validatedData['email'],
-                'password'           => Hash::make($validatedData['password']),
-                'role'               => 'teacher',
-                'otp_verified_at'  => null,
+                'first_name'          => $validatedData['first_name'],
+                'last_name'           => $validatedData['last_name'],
+                'name'                => $validatedData['first_name'] . ' ' . $validatedData['last_name'], // optional
+                'email'               => $validatedData['email'],
+                'password'            => Hash::make($validatedData['password']),
+                'otp_verified_at'     => null,
                 'verification_token' => $verificationToken,
-                'slug'               => Str::random(8),
+                'slug'                => Str::random(8),
             ]);
 
             $verificationUrl = route('verify.email', [
@@ -126,12 +128,12 @@ class RegisterController extends Controller
 
             if (!$user) {
                 // Invalid token
-                return redirect(Config('settings.frontend').'?error=invalid_token&message=' . urlencode('Invalid verification token.'));
+                return redirect(Config('settings.frontend') . '?error=invalid_token&message=' . urlencode('Invalid verification token.'));
             }
 
             // Check if already verified
             if ($user->otp_verified_at) {
-                return redirect(Config('settings.frontend').'?error=already_verified&message=' . urlencode('Email is already verified. You can login now.'));
+                return redirect(Config('settings.frontend') . '?error=already_verified&message=' . urlencode('Email is already verified. You can login now.'));
             }
 
             DB::beginTransaction();
@@ -147,16 +149,16 @@ class RegisterController extends Controller
                 DB::commit();
 
                 // redirect with success message
-                return redirect(Config('settings.frontend').'?verified=true&message=' . urlencode('Email verified successfully.'));
+                return redirect(Config('settings.frontend') . '?verified=true&message=' . urlencode('Email verified successfully.'));
             } catch (Exception $e) {
                 DB::rollBack();
                 Log::error('Email verification process failed: ' . $e->getMessage());
 
-                return redirect(Config('settings.frontend').'?error=verification_failed&message=' . urlencode('Verification failed. Please try again or contact support.'));
+                return redirect(Config('settings.frontend') . '?error=verification_failed&message=' . urlencode('Verification failed. Please try again or contact support.'));
             }
         } catch (Exception $e) {
             Log::error('Email verification error: ' . $e->getMessage());
-            return redirect(Config('settings.frontend').'?error=server_error&message=' . urlencode('Something went wrong. Please try again later.'));
+            return redirect(Config('settings.frontend') . '?error=server_error&message=' . urlencode('Something went wrong. Please try again later.'));
         }
     }
 
@@ -178,6 +180,13 @@ class RegisterController extends Controller
                 return Helper::jsonErrorResponse('Email already verified.', 409);
             }
 
+             $verificationUrl = route('verify.email', [
+                'token' => $user->verification_token
+            ]);
+
+            Mail::to($user->email)
+                ->send(new UserVerificationMail($user, $verificationUrl));
+
             $newOtp               = rand(1000, 9999);
             $otpExpiresAt         = Carbon::now()->addMinutes(60);
             $user->otp            = $newOtp;
@@ -185,9 +194,8 @@ class RegisterController extends Controller
             $user->save();
 
             //* Send the new OTP to the user's email
-            Mail::to($user->email)->send(new OtpMail($newOtp, $user, 'Verify Your Email Address'));
 
-            return Helper::jsonResponse(true, 'A new OTP has been sent to your email.', 200);
+            return Helper::jsonResponse(true, 'A new verification link has been sent to your email.', 200);
         } catch (Exception $e) {
             return Helper::jsonErrorResponse($e->getMessage(), 200);
         }

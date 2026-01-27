@@ -18,6 +18,9 @@ class User extends Authenticatable implements JWTSubject
     protected $guard_name = ['api', 'web'];
 
 
+    protected $guarded = [];
+
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -33,18 +36,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'avatar',
-        'email',
-        'password',
-        'otp',
-        'otp_expires_at',
-        'last_activity_at',
-        'slug',
-        'verification_token',
-        'otp_verified_at'
-    ];
+
 
     /**
      * The attributes that should be hidden for serialization.

@@ -21,7 +21,7 @@ class ResetPasswordController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->select = ['id', 'name', 'email', 'avatar'];   
+        $this->select = ['id', 'name', 'email', 'avatar'];
     }
     public function forgotPassword(Request $request)
     {
@@ -44,7 +44,6 @@ class ResetPasswordController extends Controller
             } else {
                 return Helper::jsonErrorResponse('Invalid Email Address', 404);
             }
-
         } catch (Exception $e) {
             return Helper::jsonErrorResponse($e->getMessage(), 500);
         }
@@ -56,14 +55,14 @@ class ResetPasswordController extends Controller
             'email' => 'required|email|exists:users,email',
             'otp'   => 'required|digits:4',
         ]);
-        
+
         try {
             $email = $request->input('email');
             $otp   = $request->input('otp');
             $user = User::where('email', $email)->first();
 
             if (!$user) {
-                return Helper::jsonErrorResponse( 'User not found', 404);
+                return Helper::jsonErrorResponse('User not found', 404);
             }
 
             if (Carbon::parse($user->otp_expires_at)->isPast()) {
@@ -106,11 +105,11 @@ class ResetPasswordController extends Controller
 
             $user = User::where('email', $email)->first();
             if (!$user) {
-                return Helper::jsonErrorResponse( 'User not found', 404);
+                return Helper::jsonErrorResponse('User not found', 404);
             }
 
             if (!empty($user->reset_password_token) && $user->reset_password_token === $request->token && $user->reset_password_token_expire_at >= Carbon::now()) {
-                
+
                 $user->password = Hash::make($newPassword);
                 $user->reset_password_token = null;
                 $user->reset_password_token_expire_at = null;
@@ -118,12 +117,24 @@ class ResetPasswordController extends Controller
                 $user->save();
 
                 return Helper::jsonResponse(true, 'Password reset successfully.', 200);
-            }else{
+            } else {
                 return Helper::jsonErrorResponse('Invalid Token', 419);
             }
-
         } catch (Exception $e) {
             return Helper::jsonErrorResponse($e->getMessage(), 500);
         }
+    }
+
+
+    public function password_update(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+        $user = auth('api')->user();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return Helper::jsonResponse(true, 'Password Updated successfully.', 200);
     }
 }
