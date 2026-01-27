@@ -56,11 +56,11 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
-    protected $appends = [
-        'role',
-        'is_online',
-        'balance'
-    ];
+    // protected $appends = [
+    //     'role',
+    //     'is_online',
+    //     'balance'
+    // ];
 
     /**
      * Get the attributes that should be cast.
