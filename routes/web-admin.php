@@ -204,7 +204,7 @@ Route::group(['middleware' => ['web-admin']], function () {
 
 
     /*
-    * CMS
+    * CMSsetting/profile
     */
 
     Route::prefix('cms')->name('cms.')->group(function () {

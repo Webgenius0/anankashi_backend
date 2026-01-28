@@ -57,7 +57,7 @@ class UserController extends Controller
 
 
         // Handle avatar separately
-        if ($request->hasFile('avatar')) {
+        if ($request->hasFile('a1vatar')) {
             if ($user->avatar) {
                 Helper::fileDelete(public_path($user->getRawOriginal('avatar')));
             }

@@ -1,10 +1,19 @@
 <script>
-    @if (session()->has('t-success'))
-        toastr.success("{{ session('t-success') }}");
-        {{ session()->forget('t-success') }}
-    @endif
-    @if (session()->has('t-error'))
-        toastr.error("{{ session('t-error') }}");
-        {{ session()->forget('t-error') }}
-    @endif
+@if(session()->has('t-success'))
+    Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: "{{ session('t-success') }}",
+        timer: 2000,
+        showConfirmButton: false
+    });
+@endif
+
+@if(session()->has('t-error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: "{{ session('t-error') }}",
+    });
+@endif
 </script>

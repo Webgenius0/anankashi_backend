@@ -42,9 +42,9 @@ class ProfileController extends Controller
             $user->email = $request->email;
 
             $user->save();
-            session()->put('t-success', 'Profile updated successfully');
+                return redirect()->back()->with('t-success', 'Profile updated successfully');
         } catch (Exception) {
-            session()->put('t-error', 'Something went wrong');
+                return redirect()->back()->with('t-success', 'Profile updated successfully');
         }
         return redirect()->back();
     }
@@ -72,42 +72,42 @@ class ProfileController extends Controller
             return redirect()->back()->with('t-error', 'Something went wrong');
         }
     }
-    public function UpdateProfilePicture(Request $request)
-    {
-        $request->validate([
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
+   public function UpdateProfilePicture(Request $request)
+{
+    $request->validate([
+        'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
+    ]);
+
+    try {
+        $user  = Auth::user();
+        $image = $request->file('profile_picture');
+        $imageName = time().'.'.$image->getClientOriginalExtension();
+
+        if ($user->avatar && file_exists(public_path($user->avatar))) {
+            Helper::fileDelete(public_path($user->avatar));
+        }
+
+        $imagePath = Helper::fileUpload($image, 'profile', $imageName);
+
+        if (!$imagePath) {
+            throw new \Exception('Image upload failed');
+        }
+
+        $user->update([
+            'avatar' => $imagePath
         ]);
 
-        try {
-            $user      = Auth::user();
-            $image     = $request->file('profile_picture');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+        return response()->json([
+            'success' => true,
+            'image_url' => asset($imagePath)
+        ]);
 
-            //? Check if there's an existing profile picture
-            if ($user->avatar && file_exists(public_path($user->avatar))) {
-                Helper::fileDelete(public_path($user->avatar));
-            }
-
-            //* Use the Helper class to handle the file upload
-            $imagePath = Helper::fileUpload($image, 'profile', $imageName);
-
-            if ($imagePath === null) {
-                throw new Exception('Failed to upload image.');
-            }
-
-            //! Update user's avatar with the new image path
-            $user->avatar = $imagePath;
-            $user->save();
-
-            return response()->json([
-                't-success'   => true,
-                'image_url' => asset($imagePath),
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                't-success' => false,
-                'message' => $e->getMessage(),
-            ]);
-        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
+
 }
