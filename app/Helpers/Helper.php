@@ -92,7 +92,7 @@ class Helper
         return response()->json($response, $code);
     }
 
-    public static function jsonErrorResponse($message, $code, $errors): JsonResponse
+    public static function jsonErrorResponse($message = null, $code = null, $errors = null): JsonResponse
     {
 
         $arr = $message;
