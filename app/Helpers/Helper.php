@@ -107,7 +107,7 @@ class Helper
 
         $response = [
             'status'  => false,
-            'Code'    => $code,
+            'code'    => $code,
             'message' => $errors,
             'erros' => $arryerrors,
         ];

@@ -30,16 +30,17 @@
                         @csrf
 
                         {{-- News Section --}}
-                        <h5 class="text-center">News Info</h5>
-                        <div class="mb-3">
+                      <div class="d-flex justify-content-between ">
+                          <div class="mb-3 col-md-6">
                             <label for="news_title">News Title</label>
                             <input type="text" class="form-control" name="news_title" id="news_title">
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 col-md-6">
                             <label for="type">Type</label>
                             <input type="text" class="form-control" name="type" id="type">
                         </div>
+                      </div>
 
                         <div class="mb-3">
                             <label for="short_description">Short Description</label>
@@ -54,7 +55,6 @@
 
 
                         {{-- News Details --}}
-                        <h5 class="mt-4 text-center">News Details</h5>
                         <div id="news-details-wrapper">
 
                             <div class="news-detail-row border p-3 mb-3">
