@@ -8,8 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class LoginController extends Controller
 {
@@ -75,8 +78,17 @@ class LoginController extends Controller
                 'data'       => $data,
             ], 200);
 
-        } catch (Exception $e) {
-            return Helper::jsonErrorResponse($e->getMessage(), 500);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
         }
     }
 

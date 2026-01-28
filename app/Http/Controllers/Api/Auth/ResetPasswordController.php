@@ -10,10 +10,13 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class ResetPasswordController extends Controller
 {
@@ -44,8 +47,17 @@ class ResetPasswordController extends Controller
             } else {
                 return Helper::jsonErrorResponse('Invalid Email Address', 404);
             }
-        } catch (Exception $e) {
-            return Helper::jsonErrorResponse($e->getMessage(), 500);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
         }
     }
 
@@ -87,13 +99,17 @@ class ResetPasswordController extends Controller
                 'code'       => 200,
                 'token'      => $token,
             ]);
-        } catch (Exception $e) {
-              return response()->json([
-            'status'  => false,
-            'code'    => 500,
-            'message' => $e->errors(),
+        } catch (ValidationException $e) {
+            DB::rollBack();
 
-        ], 500);
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
         }
     }
 
@@ -125,36 +141,45 @@ class ResetPasswordController extends Controller
             } else {
                 return Helper::jsonErrorResponse('Invalid Token', 419);
             }
-        } catch (Exception $e) {
-              return response()->json([
-            'status'  => false,
-            'code'    => 500,
-            'message' => $e->errors(),
+        } catch (ValidationException $e) {
+            DB::rollBack();
 
-        ], 500);
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
         }
     }
 
 
 
-public function password_update(Request $request)
-{
-    try {
-        $request->validate([
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+    public function password_update(Request $request)
+    {
+        try {
+            $request->validate([
+                'password' => 'required|string|min:6|confirmed',
+            ]);
 
-        $user = auth('api')->user();
-        $user->password = Hash::make($request->password);
-        $user->save();
+            $user = auth('api')->user();
+            $user->password = Hash::make($request->password);
+            $user->save();
 
-        return Helper::jsonResponse(true, 'Password Updated successfully.', 200);
-    } catch (Exception $e ) {
-        return response()->json([
-            'status'  => false,
-            'code'    => 422,
-            'message' => $e->errors(),  // Full errors object: { "field": ["error1", "error2"] }
-        ], 422);
+            return Helper::jsonResponse(true, 'Password Updated successfully.', 200);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
+        }
     }
-}
 }

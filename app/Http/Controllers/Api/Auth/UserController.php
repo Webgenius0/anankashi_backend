@@ -9,6 +9,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -79,31 +81,66 @@ class UserController extends Controller
         // Return updated user data
         $data = User::select($this->select)->find($user->id);
         return Helper::jsonResponse(true, 'Profile updated successfully', 200, $data);
-    } catch (Exception  $e) {
-        return response()->json([
-            'status'  => false,
-            'code'    => 422,
-            'message' => $e->errors(),  // Full errors object: { "field": ["error1", "error2"] }
-        ], 422);
-    }
+    } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
+        }
 }
 
 
 
     public function updateAvatar(Request $request)
-    {
+{
+    try {
+        // Validate request
         $validatedData = $request->validate([
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
+
         $user = auth('api')->user();
+
+        // Delete old avatar if exists
         if (!empty($user->avatar)) {
             Helper::fileDelete(public_path($user->getRawOriginal('avatar')));
         }
-        $validatedData['avatar'] = Helper::fileUpload($request->file('avatar'), 'user/avatar', getFileName($request->file('avatar')));
+
+        // Upload new avatar
+        $validatedData['avatar'] = Helper::fileUpload(
+            $request->file('avatar'),
+            'user/avatar',
+            getFileName($request->file('avatar'))
+        );
+
+        // Update user
         $user->update($validatedData);
+
         $data = User::select($this->select)->find($user->id);
-        return Helper::jsonResponse(true, 'Avatar updated successfully', 200, $data);
+
+        return response()->json([
+            'status'  => true,
+            'code'    => 200,
+            'message' => 'Avatar updated successfully',
+            'data'    => $data,
+        ], 200);
+
+    } catch (ValidationException $e) {
+        return Helper::jsonErrorResponse($e->errors(), 422);
+
+    } catch (Throwable $e) {
+        return Helper::jsonErrorResponse(
+            config('app.debug') ? $e->getMessage() : 'Internal server error',
+            500
+        );
     }
+}
 
     public function delete()
     {

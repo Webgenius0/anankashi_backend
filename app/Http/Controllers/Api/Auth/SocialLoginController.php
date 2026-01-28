@@ -8,8 +8,11 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use Throwable;
 
 class SocialLoginController extends Controller
 {
@@ -92,13 +95,17 @@ class SocialLoginController extends Controller
             } else {
                 return Helper::jsonResponse(false, 'Unauthorized', 401);
             }
-        } catch (Exception $e) {
-            return response()->json([
-                'status'  => false,
-                'code'    => 500,
-                'message' => $e->errors(),
+        } catch (ValidationException $e) {
+            DB::rollBack();
 
-            ], 500);
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
         }
     }
 }
