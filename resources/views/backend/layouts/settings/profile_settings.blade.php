@@ -163,52 +163,82 @@
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // Handle Image button click to trigger file input
-        $('#uploadImageBtn').click(function(e) {
-            e.preventDefault();
-            $('#profile_picture_input').click();
-        });
+$(document).ready(function () {
 
-        // Handle file input change to upload the selected image
-        $('#profile_picture_input').change(function() {
-            var formData = new FormData();
-            formData.append('profile_picture', $(this)[0].files[0]);
-            formData.append('_token', '{{ csrf_token() }}');
+    // SweetAlert2 Toast
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
 
-            $.ajax({
-                url: "{{ route('admin.update.profile.picture') }}",
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        // Update the profile picture src in the profile settings page
-                        $('.profile-img-main img').attr('src', response.image_url);
+    // Trigger file input
+    $('#uploadImageBtn').on('click', function (e) {
+        e.preventDefault();
+        $('#profile_picture_input').click();
+    });
 
-                        // Also update the profile picture in the header view page
-                        $('.profile-img-change').attr('src', response.image_url);
+    // Handle image change (preview + upload)
+    $('#profile_picture_input').on('change', function () {
 
-                        toastr.success('Profile picture updated successfully.');
-                    } else {
-                        toastr.error(response.message);
-                    }
-                },
-                error: function() {
-                    toastr.error('An error occurred while updating the profile picture.');
+        const file = this.files[0];
+        if (!file) return; // user cancelled
+
+        // 🔹 Preview image
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $('.profile-img-main img').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(file);
+
+        // 🔹 Upload image
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        formData.append('_token', '{{ csrf_token() }}');
+
+        $.ajax({
+            url: "{{ route('admin.update.profile.picture') }}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+
+            success: function (response) {
+                if (response.success) {
+                    $('.profile-img-main img').attr('src', response.image_url);
+                    $('.profile-img-change').attr('src', response.image_url);
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Profile picture updated'
+                    });
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: response.message || 'Update failed'
+                    });
                 }
-            });
-        });
+            },
 
-        // Preview image before upload
-        $('#profile_picture_input').change(function() {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('.profile-img-main img').attr('src', e.target.result);
-            };
-            reader.readAsDataURL(this.files[0]);
+            error: function (xhr) {
+    if (xhr.status === 422) {
+        Toast.fire({
+            icon: 'error',
+            title: xhr.responseJSON.message || 'Validation error'
+        });
+    } else {
+        Toast.fire({
+            icon: 'error',
+            title: 'Upload failed'
+        });
+    }
+}
+
         });
     });
+});
 </script>
+
 @endpush

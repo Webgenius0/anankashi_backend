@@ -30,7 +30,7 @@ class HomeAboutController extends Controller
     public function __construct(CmsService $cmsService)
     {
         $this->cmsService = $cmsService;
-        
+
         $this->page = PageEnum::HOME;
 
         $this->component = ['title', 'sub_title', 'bg', 'image', 'description', 'btn_text', 'btn_color', 'btn_link'];
@@ -81,7 +81,7 @@ class HomeAboutController extends Controller
             if ($section) {
                 CMS::where('page', $validatedData['page'])->where('section', $validatedData['section'])->update($validatedData);
             } else {
-                
+
                 // Generate a unique slug
                 do {
                     $validatedData['slug'] = 'slug_'.Str::random(8);
@@ -114,8 +114,8 @@ class HomeAboutController extends Controller
         } catch (Exception $e) {
 
             return back()->with('t-error', $e->getMessage());
-            
+
         }
     }
-    
+
 }

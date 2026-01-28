@@ -30,6 +30,7 @@ return new class extends Migration
             $table->unsignedBigInteger('plan_id')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->enum('is_owner', ['1', '0'])->default(0);
+            $table->boolean('is_terms')->default(0);
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

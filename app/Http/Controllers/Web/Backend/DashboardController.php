@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 
 class DashboardController extends Controller
@@ -14,36 +15,79 @@ class DashboardController extends Controller
         View::share('crud', 'dashboard');
     }
 
-    public function index()
-    {
+   public function index()
+{
+    // ===== User Analytics =====
+    $all_months = [
+        'january',
+        'february',
+        'march',
+        'april',
+        'may',
+        'june',
+        'july',
+        'august',
+        'september',
+        'october',
+        'november',
+        'december'
+    ];
 
-        $all_months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
-
-        $transactions = Transaction::select(
-            DB::raw("MONTHNAME(created_at) as month"),
-            DB::raw("SUM(CASE WHEN type = 'increment' THEN amount ELSE 0 END) as increment_total"),
-            DB::raw("SUM(CASE WHEN type = 'decrement' THEN amount ELSE 0 END) as decrement_total")
-        )
-            ->where('status', 'success')
-            ->groupBy('month')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [
-                    strtolower($item->month) => [
-                        'increment' => number_format($item->increment_total, 2),
-                        'decrement' => number_format($item->decrement_total, 2)
-                    ]
-                ];
-            });
-
-        $formatted_data = collect($all_months)->mapWithKeys(function ($month) use ($transactions) {
+    // Users grouped by month
+    $users = \App\Models\User::select(
+        DB::raw("MONTH(created_at) as month_number"),
+        DB::raw("MIN(MONTHNAME(created_at)) as month_name"),
+        DB::raw("COUNT(*) as total")
+    )
+        ->groupBy(DB::raw('MONTH(created_at)'))
+        ->orderBy('month_number')
+        ->get()
+        ->mapWithKeys(function ($item) {
             return [
-                $month => $transactions->get($month, ['increment' => '0.00', 'decrement' => '0.00'])
+                strtolower($item->month_name) => (int) $item->total
             ];
         });
 
-        file_put_contents(public_path('transactions/' . auth('web')->user()->slug . '.json'), json_encode($formatted_data));
+    // Fill missing months with 0
+    $userAnalytics = collect($all_months)->mapWithKeys(function ($month) use ($users) {
+        return [
+            ucfirst($month) => $users->get($month, 0)
+        ];
+    });
 
-        return view('backend.layouts.dashboard');
+    // ===== Calculate Growth Percentage =====
+    $growth = [];
+    $previous = null;
+    foreach ($userAnalytics as $month => $count) {
+        if ($previous === null) {
+            $growth[$month] = 0; // First month has no growth
+        } else {
+            // Percentage growth from previous month
+            $growth[$month] = $previous > 0 ? round((($count - $previous) / $previous) * 100, 1) : 0;
+        }
+        $previous = $count;
     }
+
+    // ===== Latest Users =====
+    $recentUsers = \App\Models\User::orderBy('created_at', 'desc')->limit(6)->get();
+
+    // ===== Dashboard summary counts =====
+    $totalUsers = \App\Models\User::count();
+    $totalTransactions = \App\Models\Transaction::where('status', 'success')->count();
+    $totalIncrement = \App\Models\Transaction::where('status', 'success')->where('type', 'increment')->sum('amount');
+    $totalDecrement = \App\Models\Transaction::where('status', 'success')->where('type', 'decrement')->sum('amount');
+
+    session()->forget('t-success');
+
+    return view('backend.layouts.dashboard', compact(
+        'userAnalytics',
+        'growth',          // <-- growth percentages
+        'recentUsers',
+        'totalUsers',
+        'totalTransactions',
+        'totalIncrement',
+        'totalDecrement'
+    ));
+}
+
 }
