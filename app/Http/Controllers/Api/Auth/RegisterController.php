@@ -32,57 +32,70 @@ class RegisterController extends Controller
         $this->select = ['id', 'name', 'email', 'otp', 'avatar', 'otp_verified_at', 'last_activity_at'];
     }
     public function register(Request $request)
-    {
-        DB::beginTransaction();
+{
+    DB::beginTransaction();
 
+    try {
+        // Ensure 'is_terms' is cast to boolean, even if sent as string
+
+
+        // Validate input
         $validatedData = $request->validate([
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'email'      => 'required|email|unique:users,email',
+            'password'   => 'required|string|min:6|confirmed',
             'first_name' => 'required|string',
-            'last_name' => 'required|string',
+            'last_name'  => 'required|string',
+            'is_terms'   => 'required|accepted'
         ]);
-        try {
-
-            $verificationToken = Str::random(64);
-
-            $user = User::create([
-                'first_name'          => $validatedData['first_name'],
-                'last_name'           => $validatedData['last_name'],
-                'name'                => $validatedData['first_name'] . ' ' . $validatedData['last_name'], // optional
-                'email'               => $validatedData['email'],
-                'password'            => Hash::make($validatedData['password']),
-                'otp_verified_at'     => null,
-                'verification_token' => $verificationToken,
-                'slug'                => Str::random(8),
-            ]);
-
-            $verificationUrl = route('verify.email', [
-                'token' => $user->verification_token
-            ]);
-
-            Mail::to($user->email)
-                ->send(new UserVerificationMail($user, $verificationUrl));
-
-            DB::commit(); // ✅ important
-
-            return response()->json([
-                'status'  => true,
-                'code'    => 200,
-                'message' => 'Registration successful. Please check your email.',
-            ], 200);
-        } catch (Throwable $e) {
-
-            DB::rollBack(); // ✅ now it works
 
 
-            return response()->json([
-                'status'  => false,
-                'message' => 'Something went wrong. Please try again.',
-                'code'    => 500,
-                'error'   => $e->getMessage(),
-            ], 500);
-        }
+
+
+        // Generate verification token
+        $verificationToken = Str::random(64);
+
+        // Create user
+        $user = User::create([
+            'first_name'          => $validatedData['first_name'],
+            'last_name'           => $validatedData['last_name'],
+            'name'                => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+            'email'               => $validatedData['email'],
+            'password'            => Hash::make($validatedData['password']),
+            'otp_verified_at'     => null,
+            'verification_token'  => $verificationToken,
+            'slug'                => Str::random(8),
+            'is_terms'            => $validatedData['is_terms'] ? 1 : 0, // ✅ now safe
+        ]);
+
+        // Create verification URL
+        $verificationUrl = route('verify.email', [
+            'token' => $user->verification_token
+        ]);
+
+        // Send verification email
+        Mail::to($user->email)
+            ->send(new UserVerificationMail($user, $verificationUrl));
+
+        DB::commit(); // Commit transaction
+
+        return response()->json([
+            'status'  => true,
+            'code'    => 200,
+            'message' => 'Registration successful. Please check your email.',
+        ], 200);
+
+    } catch (Throwable $e) {
+        DB::rollBack(); // Rollback if anything fails
+
+        return response()->json([
+            'status'  => false,
+            'code'    => 500,
+            'message' => 'Something went wrong. Please try again.',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
+
 
     // public function VerifyEmail(Request $request)
     // {
