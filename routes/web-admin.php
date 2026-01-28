@@ -295,6 +295,7 @@ Route::group(['middleware' => ['web-admin']], function () {
     Route::put('news/update/{id}', 'update')->name('news.update');
     Route::delete('news/delete/{id}', 'destroy')->name('news.destroy');
     Route::get('news/status/{id}', 'status')->name('news.status');
+    Route::get('/{id}', 'show')->name('news.show');
 });
 
     //! Route for Mail Settings

@@ -43,7 +43,7 @@
 
                         <div class="mb-3">
                             <label for="short_description">Short Description</label>
-                            <textarea class="form-control" name="short_description"></textarea>
+                            <textarea class="form-control summernote" name="short_description"></textarea>
                         </div>
 
                         <div class="mb-3">
@@ -70,7 +70,7 @@
 
                                 <div class="mb-3">
                                     <label>Description</label>
-                                    <textarea name="details[0][description]" class="form-control"></textarea>
+                                    <textarea name="details[0][description]" class="form-control summernote"></textarea>
                                 </div>
 
                                 <div class="images-wrapper">

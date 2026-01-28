@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +25,11 @@ class UserController extends Controller
         return Helper::jsonResponse(true, 'User details fetched successfully', 200, $data);
     }
 
-    public function updateProfile(Request $request)
-    {
-        $user = auth('api')->user();
+   public function updateProfile(Request $request)
+{
+    $user = auth('api')->user();
 
+    try {
         // Validate the request
         $validatedData = $request->validate([
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
@@ -54,10 +56,13 @@ class UserController extends Controller
         $user->dob = $request->dob;
         $user->country = $request->country;
 
-
+        // Handle password if provided
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
 
         // Handle avatar separately
-        if ($request->hasFile('a1vatar')) {
+        if ($request->hasFile('avatar')) {  // Fixed typo: 'a1vatar' → 'avatar'
             if ($user->avatar) {
                 Helper::fileDelete(public_path($user->getRawOriginal('avatar')));
             }
@@ -74,7 +79,14 @@ class UserController extends Controller
         // Return updated user data
         $data = User::select($this->select)->find($user->id);
         return Helper::jsonResponse(true, 'Profile updated successfully', 200, $data);
+    } catch (Exception  $e) {
+        return response()->json([
+            'status'  => false,
+            'code'    => 422,
+            'message' => $e->errors(),  // Full errors object: { "field": ["error1", "error2"] }
+        ], 422);
     }
+}
 
 
 

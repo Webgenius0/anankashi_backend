@@ -17,7 +17,7 @@ class SocialLoginController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->select = ['id', 'name', 'email', 'avatar'];   
+        $this->select = ['id', 'name', 'email', 'avatar'];
     }
 
     public function RedirectToProvider($provider)
@@ -93,7 +93,12 @@ class SocialLoginController extends Controller
                 return Helper::jsonResponse(false, 'Unauthorized', 401);
             }
         } catch (Exception $e) {
-            return Helper::jsonResponse(false, 'Something went wrong', 500, ['error' => $e->getMessage()]);
+            return response()->json([
+                'status'  => false,
+                'code'    => 500,
+                'message' => $e->errors(),
+
+            ], 500);
         }
     }
 }

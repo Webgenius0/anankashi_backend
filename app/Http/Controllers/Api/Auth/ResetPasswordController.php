@@ -88,7 +88,12 @@ class ResetPasswordController extends Controller
                 'token'      => $token,
             ]);
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse($e->getMessage(), 500);
+              return response()->json([
+            'status'  => false,
+            'code'    => 500,
+            'message' => $e->errors(),
+
+        ], 500);
         }
     }
 
@@ -121,20 +126,35 @@ class ResetPasswordController extends Controller
                 return Helper::jsonErrorResponse('Invalid Token', 419);
             }
         } catch (Exception $e) {
-            return Helper::jsonErrorResponse($e->getMessage(), 500);
+              return response()->json([
+            'status'  => false,
+            'code'    => 500,
+            'message' => $e->errors(),
+
+        ], 500);
         }
     }
 
 
-    public function password_update(Request $request)
-    {
+
+public function password_update(Request $request)
+{
+    try {
         $request->validate([
             'password' => 'required|string|min:6|confirmed',
         ]);
+
         $user = auth('api')->user();
         $user->password = Hash::make($request->password);
         $user->save();
 
         return Helper::jsonResponse(true, 'Password Updated successfully.', 200);
+    } catch (Exception $e ) {
+        return response()->json([
+            'status'  => false,
+            'code'    => 422,
+            'message' => $e->errors(),  // Full errors object: { "field": ["error1", "error2"] }
+        ], 422);
     }
+}
 }

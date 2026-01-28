@@ -23,16 +23,24 @@ class NewsController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->editColumn('thumbnail', fn($row) => '<img src="'.asset($row->thumbnail).'" width="60">')
+                ->editColumn('thumbnail', fn($row) => '<img src="' . asset($row->thumbnail) . '" width="60">')
                 ->editColumn('status', fn($row) => $row->status === 'publish'
                     ? '<span class="badge bg-success">Publish</span>'
                     : '<span class="badge bg-danger">Unpublish</span>')
                 ->addColumn('action', function ($row) {
                     return '
-                        <a href="'.route('admin.news.edit', $row->id).'" class="btn btn-sm btn-primary">Edit</a>
-                        <button data-id="'.$row->id.'" class="btn btn-sm btn-danger delete">Delete</button>
+                        <a href="' . route('admin.news.edit', $row->id) . '" class="btn btn-sm btn-primary">Edit</a>
+                        <button data-id="' . $row->id . '" class="btn btn-sm btn-danger delete">Delete</button>
                     ';
                 })
+                ->addColumn('action', function ($row) {
+                    return '
+        <button onclick="goToView(' . $row->id . ')" class="btn btn-sm btn-info">View</button>
+        <button onclick="goToEdit(' . $row->id . ')" class="btn btn-sm btn-primary">Edit</button>
+        <button data-id="' . $row->id . '" class="btn btn-sm btn-danger delete">Delete</button>
+    ';
+                })
+
                 ->rawColumns(['thumbnail', 'status', 'action'])
                 ->make(true);
         }
@@ -47,6 +55,26 @@ class NewsController extends Controller
     {
         return view('backend.layouts.news.create');
     }
+
+public function show($id)
+{
+    try {
+        $news = News::with('details.images')->findOrFail($id);
+
+        // Return JSON
+        return response()->json([
+            'status' => true,
+            'data' => $news
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong: '.$e->getMessage()
+        ], 500);
+    }
+}
+
 
     /* ===============================
      * STORE NEWS + MULTIPLE DETAILS + IMAGES
@@ -104,21 +132,33 @@ class NewsController extends Controller
 
             DB::commit();
             return redirect()->route('admin.news.index')->with('t-success', 'News, details, and images created successfully');
-
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('t-error', 'Something went wrong: '.$e->getMessage());
+            return redirect()->back()->withInput()->with('t-error', 'Something went wrong: ' . $e->getMessage());
         }
     }
 
     /* ===============================
      * EDIT FORM
      * =============================== */
-    public function edit($id)
-    {
+public function edit($id)
+{
+    try {
         $news = News::with('details.images')->findOrFail($id);
+
+        // Decode Summernote content if needed
+        $news->short_description = html_entity_decode($news->short_description);
+
         return view('backend.layouts.news.edit', compact('news'));
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong: ' . $e->getMessage()
+        ], 500);
     }
+}
+
+
 
     /* ===============================
      * UPDATE NEWS + MULTIPLE DETAILS + IMAGES
@@ -143,9 +183,9 @@ class NewsController extends Controller
             // 1️⃣ Update News
             $news = News::findOrFail($id);
             $news->title = $request->news_title;
-            $news->slug = Str::slug($request->news_title);
+            $news->slug = Str::slug($request->news_title) ?? $news->slug;
             $news->short_description = $request->short_description;
-            $news->status = $request->status;
+            $news->status = $request->status ?? $news->status;
             $news->type = $request->type;
 
             if ($request->hasFile('thumbnail')) {
@@ -156,6 +196,7 @@ class NewsController extends Controller
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $news->thumbnail = Helper::fileUpload($image, 'news', $imageName);
             }
+
 
             $news->save();
 
@@ -183,10 +224,9 @@ class NewsController extends Controller
 
             DB::commit();
             return redirect()->route('admin.news.index')->with('t-success', 'News, details, and images updated successfully');
-
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('t-error', 'Something went wrong: '.$e->getMessage());
+            return redirect()->back()->withInput()->with('t-error', 'Something went wrong: ' . $e->getMessage());
         }
     }
 
@@ -208,11 +248,10 @@ class NewsController extends Controller
                 'status' => true,
                 'message' => 'News deleted successfully'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Something went wrong: '.$e->getMessage()
+                'message' => 'Something went wrong: ' . $e->getMessage()
             ]);
         }
     }
@@ -231,11 +270,10 @@ class NewsController extends Controller
                 'status' => true,
                 'message' => 'Status updated'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Something went wrong: '.$e->getMessage()
+                'message' => 'Something went wrong: ' . $e->getMessage()
             ]);
         }
     }

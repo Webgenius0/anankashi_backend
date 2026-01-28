@@ -23,14 +23,11 @@ class LoginController extends Controller
     public function Login(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'email'    => 'required|email|exists:users,email',
-                'password' => 'required|string|min:6',
-            ]);
+           $request->validate([
+               'email'    => 'required|email|exists:users,email',
+               'password' => 'required|string|min:6',
+           ]);
 
-            if ($validator->fails()) {
-                return Helper::jsonResponse(false, 'Validation failed', 422, $validator->errors());
-            }
 
             $user = User::where('email', $request->email);
 
@@ -79,7 +76,12 @@ class LoginController extends Controller
             ], 200);
 
         } catch (Exception $e) {
-            return Helper::jsonResponse(false, 'An error occurred during login.', 500, ['error' => $e->getMessage()]);
+              return response()->json([
+            'status'  => false,
+            'code'    => 500,
+            'message' => $e->errors(),
+
+        ], 500);
         }
     }
 
