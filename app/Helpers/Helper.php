@@ -108,7 +108,7 @@ class Helper
         $response = [
             'status'  => false,
             'Code'    => $code,
-            'global_errors' => $errors,
+            'message' => $errors,
             'erros' => $arryerrors,
         ];
         return response()->json($response, $code);
