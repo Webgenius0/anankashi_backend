@@ -33,64 +33,62 @@ class RegisterController extends Controller
         $this->select = ['id', 'name', 'email', 'otp', 'avatar', 'otp_verified_at', 'last_activity_at'];
     }
 
-public function register(Request $request)
-{
-    DB::beginTransaction();
+    public function register(Request $request)
+    {
+        DB::beginTransaction();
 
-    try {
+        try {
 
-        $validatedData = $request->validate([
-            'email'      => 'required|email|unique:users,email',
-            'password'   => 'required|string|min:6|confirmed',
-            'first_name' => 'required|string',
-            'last_name'  => 'required|string',
-            'is_terms'   => 'required|accepted'
-        ]);
+            $validatedData = $request->validate([
+                'email'      => 'required|email|unique:users,email',
+                'password'   => 'required|string|min:6|confirmed',
+                'first_name' => 'required|string',
+                'last_name'  => 'required|string',
+                'is_terms'   => 'required|accepted'
+            ]);
 
-        $verificationToken = Str::random(64);
+            $verificationToken = Str::random(64);
 
-        $user = User::create([
-            'first_name'         => $validatedData['first_name'],
-            'last_name'          => $validatedData['last_name'],
-            'name'               => $validatedData['first_name'].' '.$validatedData['last_name'],
-            'email'              => $validatedData['email'],
-            'password'           => Hash::make($validatedData['password']),
-            'otp_verified_at'    => null,
-            'verification_token' => $verificationToken,
-            'slug'               => Str::random(8),
-            'is_terms'           => $validatedData['is_terms'] ? 1 : 0,
-        ]);
+            $user = User::create([
+                'first_name'         => $validatedData['first_name'],
+                'last_name'          => $validatedData['last_name'],
+                'name'               => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'email'              => $validatedData['email'],
+                'password'           => Hash::make($validatedData['password']),
+                'otp_verified_at'    => null,
+                'verification_token' => $verificationToken,
+                'slug'               => Str::random(8),
+                'is_terms'           => $validatedData['is_terms'] ? 1 : 0
+            ]);
 
-        $verificationUrl = route('verify.email', [
-            'token' => $user->verification_token
-        ]);
+            $verificationUrl = route('verify.email', [
+                'token' => $user->verification_token
+            ]);
 
-        Mail::to($user->email)
-            ->send(new UserVerificationMail($user, $verificationUrl));
+            Mail::to($user->email)
+                ->send(new UserVerificationMail($user, $verificationUrl));
 
-        DB::commit();
+            DB::commit();
 
-        return response()->json([
-            'status'  => true,
-            'code'    => 200,
-            'message' => 'Registration successful. Please check your email.',
-        ], 200);
+            return response()->json([
+                'status'  => true,
+                'code'    => 200,
+                'message' => 'Registration successful. Please check your email.',
+            ], 200);
+        } catch (ValidationException $e) {
 
-    } catch (ValidationException $e) {
+            DB::rollBack();
 
-        DB::rollBack();
+            // ✅ RETURNS ALL EXACT VALIDATION ERRORS
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (\Throwable $e) {
 
-        // ✅ RETURNS ALL EXACT VALIDATION ERRORS
-        return Helper::jsonErrorResponse($e->errors(), 500);
 
-    } catch (\Throwable $e) {
+            DB::rollBack();
 
-        DB::rollBack();
-
-    return Helper::jsonErrorResponse($e->errors(), 500);
-
+            return Helper::jsonErrorResponse($e->getMessage(), 500);
+        }
     }
-}
 
 
     public function verifyEmail(Request $rquest)

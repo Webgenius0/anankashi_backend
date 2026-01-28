@@ -92,8 +92,10 @@ class Helper
         return response()->json($response, $code);
     }
 
-    public static function jsonErrorResponse(array $message, int $code = 400, array $errors = []): JsonResponse
+    public static function jsonErrorResponse( $message, int $code = 400, array $errors = []): JsonResponse
     {
+
+    $message = (array) $message;
 
         $response = [
             'status'  => false,
