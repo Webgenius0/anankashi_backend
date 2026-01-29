@@ -150,6 +150,7 @@ Route::prefix('news')->middleware('auth:api')->group(function () {
     Route::get('/details', [NewsController::class, 'news_details']);
     Route::post('/add-comment', [NewsController::class, 'addComment']);
     Route::get('/comments', [NewsController::class, 'comments']);
+    Route::get('/type', [NewsController::class, 'news_type']);
     Route::post('/reaction', [NewsController::class, 'reaction']);
 
 });
