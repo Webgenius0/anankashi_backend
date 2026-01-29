@@ -88,7 +88,7 @@ class NewsController extends Controller
                     ];
                 }),
                 'total_comments' => $news->comments->count(),
-                'total_likes' => $news->comments->count(),
+                'total_likes' => $news->likes->count(),
                 'comments' => $news->comments->whereNull('parent_id')->values()->map(function ($comment) {
 
                     return [
