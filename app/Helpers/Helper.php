@@ -117,7 +117,7 @@ class Helper
             'status'  => false,
             'code'    => $code,
             'message' => $errors,
-            'erros' => $arryerrors,
+            'errors' => $arryerrors,
         ];
         return response()->json($response, $code);
     }

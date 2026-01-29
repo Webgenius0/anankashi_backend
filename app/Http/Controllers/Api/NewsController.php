@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\Like;
 use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -87,6 +88,7 @@ class NewsController extends Controller
                     ];
                 }),
                 'total_comments' => $news->comments->count(),
+                'total_likes' => $news->comments->count(),
                 'comments' => $news->comments->whereNull('parent_id')->values()->map(function ($comment) {
 
                     return [
@@ -158,6 +160,50 @@ class NewsController extends Controller
                 'status' => true,
                 'message' => 'Comment added successfully',
             ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
+        }
+    }
+
+    public function toggleLike(Request $request)
+    {
+       try {
+        $request->validate([
+            'news_id' => 'required|exists:news,id',
+        ]);
+
+        $userId = auth('api')->id();
+
+        $like = Like::where('news_id', $request->news_id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($like) {
+            $like->delete();
+            $liked = false;
+        } else {
+            Like::create([
+                'news_id' => $request->news_id,
+                'user_id' => $userId
+            ]);
+            $liked = true;
+        }
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => $liked ? 'News liked successfully' : 'News unliked successfully',
+        ]);
+
         } catch (ValidationException $e) {
             DB::rollBack();
 
