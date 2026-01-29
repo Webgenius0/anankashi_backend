@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class NewsController extends Controller
 {
@@ -140,7 +141,7 @@ class NewsController extends Controller
 
             DB::commit();
             return redirect()->route('admin.news.index')->with('t-success', 'News, details, and images created successfully');
-        } catch (\Exception $e) {
+        } catch (ValidationException $e) {
             DB::rollBack();
             return redirect()->back()->withInput()->with('t-error', 'Something went wrong: ' . $e->getMessage());
         }
