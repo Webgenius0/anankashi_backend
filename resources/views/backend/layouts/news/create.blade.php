@@ -58,10 +58,13 @@
                             {{-- News Details --}}
                             <div id="news-details-wrapper">
 
+                               <div class="text-end">
+                                 <button type="button" class="btn btn-secondary mb-3" id="add-detail">Add News
+                                    Detail</button>
+                               </div>
                                 <div class="news-detail-row border p-3 mb-3">
                                     <div class="d-flex justify-content-between mb-2">
                                         <h6>Detail</h6>
-                                        <button type="button" class="btn btn-danger btn-sm remove-detail">Remove</button>
                                     </div>
 
                                     <div class="mb-3">
@@ -71,7 +74,7 @@
 
                                     <div class="mb-3">
                                         <label>Description</label>
-                                        <textarea name="details[0][description]" class="form-control summernote" ></textarea>
+                                        <textarea name="details[0][description]" class="form-control summernote"></textarea>
                                     </div>
 
                                     <div class="images-wrapper">
@@ -89,7 +92,7 @@
 
                             </div>
 
-                            <button type="button" class="btn btn-secondary mb-3" id="add-detail">Add News Detail</button>
+
 
                             <div>
                                 <button type="submit" class="btn btn-primary">Submit</button>

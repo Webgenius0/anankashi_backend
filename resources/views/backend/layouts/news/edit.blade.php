@@ -24,8 +24,7 @@
 
             <!-- Short Description -->
             <div class="mb-3">
-                <label for="short_description" class="form-label fw-semibold text-start d-block">Short
-                    Description</label>
+                <label for="short_description" class="form-label fw-semibold text-start d-block">Short Description</label>
                 <textarea id="short_description" class="form-control summernote" name="short_description">{{ old('short_description', $news->short_description) }}</textarea>
             </div>
 
@@ -42,6 +41,10 @@
             <h5 class="mt-4 mb-3 text-start">News Details</h5>
 
             <div id="news-details-wrapper">
+                <div class="text-end mb-3">
+                    <button type="button" class="btn btn-secondary" id="add-detail">Add News Detail</button>
+                </div>
+
                 @foreach ($news->details as $index => $detail)
                     <div class="news-detail-row border p-3 mb-3 position-relative">
 
@@ -70,15 +73,14 @@
                             <label class="form-label fw-semibold text-start d-block">Add Images</label>
                             <div class="images-wrapper">
                                 <div class="input-group mb-2">
-                                    <input type="file" name="details[{{ $index }}][images][]"
-                                        class="form-control">
+                                    <input type="file" name="details[{{ $index }}][images][]" class="form-control">
                                     <button type="button" class="btn btn-success add-image">+</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Existing Images -->
-                        @if($detail->images->count() > 0)
+                        @if ($detail->images->count() > 0)
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-start d-block">Existing Images</label>
                                 <div>
@@ -91,8 +93,6 @@
                     </div>
                 @endforeach
             </div>
-
-            <button type="button" class="btn btn-secondary mb-3" id="add-detail">Add News Detail</button>
 
             <div>
                 <button type="submit" class="btn btn-primary">Update</button>
@@ -115,39 +115,44 @@
 <script>
     let detailIndex = {{ $news->details->count() }};
 
-    // Remove any existing click handlers first
-    $('#add-detail').off('click');
-
-    // Add single click handler
-    $('#add-detail').on('click', function() {
+    // Add new detail row
+    $(document).on('click', '#add-detail', function() {
         let html = `
-    <div class="news-detail-row border p-3 mb-3 position-relative">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="mb-0">Detail</h6>
-            <button type="button" class="btn btn-danger btn-sm remove-detail">Remove</button>
-        </div>
+        <div class="news-detail-row border p-3 mb-3 position-relative">
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold text-start d-block">Detail Title</label>
-            <input type="text" name="details[${detailIndex}][title]" class="form-control">
-        </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Detail</h6>
+                <button type="button" class="btn btn-danger btn-sm remove-detail">Remove</button>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold text-start d-block">Description</label>
-            <textarea name="details[${detailIndex}][description]" class="form-control summernote"></textarea>
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-start d-block">Detail Title</label>
+                <input type="text" name="details[${detailIndex}][title]" class="form-control">
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold text-start d-block">Add Images</label>
-            <div class="images-wrapper">
-                <div class="input-group mb-2">
-                    <input type="file" name="details[${detailIndex}][images][]" class="form-control">
-                    <button type="button" class="btn btn-success add-image">+</button>
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-start d-block">Description</label>
+                <textarea name="details[${detailIndex}][description]" class="form-control summernote"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-start d-block">Add Images</label>
+                <div class="images-wrapper">
+                    <div class="input-group mb-2">
+                        <input type="file" name="details[${detailIndex}][images][]" class="form-control">
+                        <button type="button" class="btn btn-success add-image">+</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>`;
+        </div>`;
+
         $('#news-details-wrapper').append(html);
+
+        // Initialize Summernote for the new textarea
+        $('#news-details-wrapper').find('textarea.summernote').last().summernote({
+            height: 120
+        });
+
         detailIndex++;
     });
 
@@ -170,5 +175,12 @@
     // Remove image input
     $(document).on('click', '.remove-image', function() {
         $(this).closest('.input-group').remove();
+    });
+
+    // Initialize Summernote for existing textareas
+    $(document).ready(function() {
+        $('textarea.summernote').summernote({
+            height: 120
+        });
     });
 </script>
