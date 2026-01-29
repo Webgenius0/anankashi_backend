@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\News;
+use Google\Cloud\Storage\Connection\Rest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -16,40 +17,59 @@ use Throwable;
 class NewsController extends Controller
 {
     //
-    public function news()
-    {
+    public function news(Request $request)
+{
 
-        try {
-            $news = News::all()->map(function ($news) {
-                return [
-                    'id' => $news->id,
-                    'slug' => $news->slug,
-                    'title' => $news->title,
-                    'description' => Str::limit($news->short_description),
-                    'thumbnail' => $news->thumbnail ? asset($news->thumbnail) : null,
-                    'date' => $news->created_at->format('l F d Y'),
+    try {
+        $request->validate([
+            'current_page' => 'sometimes|integer|min:1',
+            'per_page' => 'sometimes|integer|min:1|max:100',
+        ]);
 
-                ];
-            });
-            return response()->json([
-                'status' => true,
-                'message' => 'News fetched successfully',
-                'data' => $news
+        $page = $request->input('current_page', 1);
+        $perPage = $request->input('per_page', 10);
+        // Paginate news
+        $newsPaginator = News::latest('id')->paginate($perPage, ['*'], 'page', $page);
 
-            ]);
-        } catch (ValidationException $e) {
-            DB::rollBack();
+        $newsData = $newsPaginator->getCollection()->map(function ($newsItem) {
+            return [
+                'id' => $newsItem->id,
+                'slug' => $newsItem->slug,
+                'title' => $newsItem->title,
+                'description' => Str::limit($newsItem->short_description, 100),
+                'thumbnail' => $newsItem->thumbnail ? asset($newsItem->thumbnail) : null,
+                'date' => $newsItem->created_at->format('l F d Y'),
+            ];
+        });
 
-            return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
-        } catch (Throwable $e) {
-            DB::rollBack();
+        // Replace paginator items with mapped data
+        $newsPaginator->setCollection($newsData);
 
-            return Helper::jsonErrorResponse(
-                config('app.debug') ? $e->getMessage() : 'Internal server error',
-                500
-            );
-        }
+        // Build response
+        return response()->json([
+            'status' => true,
+            'message' => 'News fetched successfully',
+            'data' => [
+                'newslist' => $newsPaginator->items(), // mapped items
+                'pagination' => [
+                    'total_page' => $newsPaginator->lastPage(),
+                    'per_page' => $newsPaginator->perPage(),
+                    'total_item' => $newsPaginator->total(),
+                    'current_page' => $newsPaginator->currentPage(),
+                ],
+            ],
+        ]);
+
+    } catch (ValidationException $e) {
+        return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
+    } catch (Throwable $e) {
+        return Helper::jsonErrorResponse(
+            config('app.debug') ? $e->getMessage() : 'Internal server error',
+            500
+        );
     }
+}
+
 
     public function news_details()
     {
@@ -176,34 +196,33 @@ class NewsController extends Controller
 
     public function toggleLike(Request $request)
     {
-       try {
-        $request->validate([
-            'news_id' => 'required|exists:news,id',
-        ]);
-
-        $userId = auth('api')->id();
-
-        $like = Like::where('news_id', $request->news_id)
-            ->where('user_id', $userId)
-            ->first();
-
-        if ($like) {
-            $like->delete();
-            $liked = false;
-        } else {
-            Like::create([
-                'news_id' => $request->news_id,
-                'user_id' => $userId
+        try {
+            $request->validate([
+                'news_id' => 'required|exists:news,id',
             ]);
-            $liked = true;
-        }
 
-        return response()->json([
-            'status' => true,
-            'code' => 200,
-            'message' => $liked ? 'News liked successfully' : 'News unliked successfully',
-        ]);
+            $userId = auth('api')->id();
 
+            $like = Like::where('news_id', $request->news_id)
+                ->where('user_id', $userId)
+                ->first();
+
+            if ($like) {
+                $like->delete();
+                $liked = false;
+            } else {
+                Like::create([
+                    'news_id' => $request->news_id,
+                    'user_id' => $userId
+                ]);
+                $liked = true;
+            }
+
+            return response()->json([
+                'status' => true,
+                'code' => 200,
+                'message' => $liked ? 'News liked successfully' : 'News unliked successfully',
+            ]);
         } catch (ValidationException $e) {
             DB::rollBack();
 
