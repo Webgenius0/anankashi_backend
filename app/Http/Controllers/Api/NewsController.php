@@ -288,7 +288,7 @@ class NewsController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Comments fetched successfully',
-            'data' => $comments->where('parent_id', null)->map(function ($comment) {
+            'data' => $comments->values()->where('parent_id', null)->map(function ($comment) {
                 return [
 
                     'id' => $comment->id,
