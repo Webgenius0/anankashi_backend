@@ -283,7 +283,7 @@ class NewsController extends Controller
 
     public function comments(Request $request)
     {
-        $comments = Comment::with(['user', 'replies'])->values()->where('news_id', $request->news_id)->get();
+        $comments = Comment::with(['user', 'replies'])->where('news_id', $request->news_id)->get();
 
         return response()->json([
             'status' => true,
@@ -307,7 +307,7 @@ class NewsController extends Controller
                             'reply' => $reply->comment,
                             'commented_at' => $reply->created_at->diffForHumans(),
                         ];
-                    })
+                    })->values()
 
                 ];
             })
