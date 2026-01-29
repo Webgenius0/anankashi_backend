@@ -121,6 +121,8 @@ class NewsController extends Controller
                 'total_comments' => $news->comments->count(),
                 'total_likes' => $news->likes->count(),
                 'total_dislike' => $news->dislikes->count(),
+                'is_liked' => $news->likes()->where('user_id', auth()->user()->id)->exists(),
+                'is_disliked' => $news->dislikes()->where('user_id', auth()->user()->id)->exists(),
                 // 'comments' => $news->comments->whereNull('parent_id')->values()->map(function ($comment) {
 
                 //     return [
