@@ -140,20 +140,22 @@ $(document).ready(function () {
 });
 
 /* ================= STATUS ================= */
-function showStatusChangeAlert(id) {
-    event.preventDefault();
-    Swal.fire({
-        title: 'Are you sure?',
-        text: 'You want to update the status?',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: 'Yes',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            statusChange(id);
-        }
-    });
-}
+    function showStatusChangeAlert(id) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You want to update the status?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                statusChange(id);
+            }
+        });
+    }
 
 function statusChange(id) {
     NProgress.start();
@@ -276,9 +278,12 @@ function initializeEditScripts() {
 
     // Remove detail row
     $(document).off('click', '.remove-detail').on('click', '.remove-detail', function() {
-        if (confirm('Are you sure you want to remove this detail?')) {
+
+
             $(this).closest('.news-detail-row').remove();
-        }
+
+
+
     });
 
     // Add new image input inside a detail
@@ -295,9 +300,8 @@ function initializeEditScripts() {
 
     // Remove image input (for new ones)
     $(document).off('click', '.remove-image').on('click', '.remove-image', function() {
-        if (confirm('Are you sure you want to remove this image input?')) {
             $(this).closest('.input-group').remove();
-        }
+
     });
 }
 // Bind dynamic buttons inside modal

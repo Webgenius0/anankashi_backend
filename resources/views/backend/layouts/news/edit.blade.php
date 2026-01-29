@@ -24,7 +24,8 @@
 
             <!-- Short Description -->
             <div class="mb-3">
-                <label for="short_description" class="form-label fw-semibold text-start d-block">Short Description</label>
+                <label for="short_description" class="form-label fw-semibold text-start d-block">Short
+                    Description</label>
                 <textarea id="short_description" class="form-control summernote" name="short_description">{{ old('short_description', $news->short_description) }}</textarea>
             </div>
 
@@ -33,6 +34,7 @@
                 <label for="thumbnail" class="form-label fw-semibold text-start d-block">Thumbnail</label>
                 <input type="file" id="thumbnail" class="form-control" name="thumbnail">
                 @if ($news->thumbnail)
+                    <label class="form-label fw-semibold text-start d-block mt-3">Existing Thumbnail</label>
                     <img src="{{ asset($news->thumbnail) }}" width="120" class="mt-2">
                 @endif
             </div>
@@ -63,21 +65,29 @@
                             <textarea name="details[{{ $index }}][description]" class="form-control summernote">{{ $detail->description }}</textarea>
                         </div>
 
-                        <!-- Existing Images -->
-                        <div class="mb-3">
-                            @foreach ($detail->images as $img)
-                                <img src="{{ asset($img->image) }}" width="100" class="me-2 mb-2">
-                            @endforeach
-                        </div>
-
                         <!-- Add New Images -->
-                        <div class="images-wrapper">
-                            <div class="input-group mb-2">
-                                <input type="file" name="details[{{ $index }}][images][]"
-                                    class="form-control">
-                                <button type="button" class="btn btn-success add-image">+</button>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-start d-block">Add Images</label>
+                            <div class="images-wrapper">
+                                <div class="input-group mb-2">
+                                    <input type="file" name="details[{{ $index }}][images][]"
+                                        class="form-control">
+                                    <button type="button" class="btn btn-success add-image">+</button>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Existing Images -->
+                        @if($detail->images->count() > 0)
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-start d-block">Existing Images</label>
+                                <div>
+                                    @foreach ($detail->images as $img)
+                                        <img src="{{ asset($img->image) }}" width="100" class="me-2 mb-2">
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
             </div>
@@ -96,6 +106,7 @@
     .note-editable {
         text-align: left !important;
     }
+
     .note-editable p {
         text-align: left !important;
     }
@@ -104,7 +115,11 @@
 <script>
     let detailIndex = {{ $news->details->count() }};
 
-    $('#add-detail').click(function() {
+    // Remove any existing click handlers first
+    $('#add-detail').off('click');
+
+    // Add single click handler
+    $('#add-detail').on('click', function() {
         let html = `
     <div class="news-detail-row border p-3 mb-3 position-relative">
         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -122,10 +137,13 @@
             <textarea name="details[${detailIndex}][description]" class="form-control summernote"></textarea>
         </div>
 
-        <div class="images-wrapper">
-            <div class="input-group mb-2">
-                <input type="file" name="details[${detailIndex}][images][]" class="form-control">
-                <button type="button" class="btn btn-success add-image">+</button>
+        <div class="mb-3">
+            <label class="form-label fw-semibold text-start d-block">Add Images</label>
+            <div class="images-wrapper">
+                <div class="input-group mb-2">
+                    <input type="file" name="details[${detailIndex}][images][]" class="form-control">
+                    <button type="button" class="btn btn-success add-image">+</button>
+                </div>
             </div>
         </div>
     </div>`;

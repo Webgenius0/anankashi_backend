@@ -92,18 +92,26 @@ class Helper
         return response()->json($response, $code);
     }
 
-    public static function jsonErrorResponse($message = null, $code = null, $errors = null): JsonResponse
+    public static function jsonErrorResponse($message = null, $code = null, $errors = 'Error'): JsonResponse
     {
 
         $arr = $message;
         $arryerrors = [];
 
-        foreach ($arr  as $key => $value) {
+       if(is_array($message)){
+            foreach ($arr  as $key => $value) {
             $arryerrors[] = [
                 'field'   => $key,
                 'message' => $value[0], // first error only
             ];
         }
+       }
+       else{
+            $arryerrors[] = [
+                'field'   => 'error',
+                'message' => $message,
+            ];
+       }
 
         $response = [
             'status'  => false,

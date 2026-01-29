@@ -24,14 +24,23 @@ class NewsController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('thumbnail', fn($row) => '<img src="' . asset($row->thumbnail) . '" width="60">')
-                ->editColumn('status', fn($row) => $row->status === 'publish'
-                    ? '<span class="badge bg-success">Publish</span>'
-                    : '<span class="badge bg-danger">Unpublish</span>')
-                ->addColumn('action', function ($row) {
-                    return '
-                        <a href="' . route('admin.news.edit', $row->id) . '" class="btn btn-sm btn-primary">Edit</a>
-                        <button data-id="' . $row->id . '" class="btn btn-sm btn-danger delete">Delete</button>
-                    ';
+
+                ->addColumn('status', function ($data) {
+                   $isPublish = $data->status === 'publish';
+
+                    $backgroundColor = $isPublish ? '#4CAF50' : '#ccc';
+                    $sliderTranslateX = $isPublish ? '26px' : '2px';
+                    $checked = $isPublish ? 'checked' : '';
+
+                    $status = '<div class="d-flex justify-content-center align-items-center">';
+                    $status .= '<div class="form-check form-switch" style="position: relative; width: 50px; height: 24px; background-color: ' . $backgroundColor . '; border-radius: 12px; transition: background-color 0.3s ease; cursor: pointer;">';
+                    $status .= '<input onclick="showStatusChangeAlert(' . $data->id . ')" type="checkbox" class="form-check-input" id="customSwitch' . $data->id . '" getAreaid="' . $data->id . '" name="status" style="position: absolute; width: 100%; height: 100%; opacity: 0; z-index: 2; cursor: pointer;">';
+                    $status .= '<span style="position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: transform 0.3s ease; transform: translateX(' . $sliderTranslateX . ');"></span>';
+                    $status .= '<label for="customSwitch' . $data->id . '" class="form-check-label" style="margin-left: 10px;"></label>';
+                    $status .= '</div>';
+                    $status .= '</div>';
+
+                    return $status;
                 })
                 ->addColumn('action', function ($row) {
                     return '
@@ -56,24 +65,23 @@ class NewsController extends Controller
         return view('backend.layouts.news.create');
     }
 
-public function show($id)
-{
-    try {
-        $news = News::with('details.images')->findOrFail($id);
+    public function show($id)
+    {
+        try {
+            $news = News::with('details.images')->findOrFail($id);
 
-        // Return JSON
-        return response()->json([
-            'status' => true,
-            'data' => $news
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Something went wrong: '.$e->getMessage()
-        ], 500);
+            // Return JSON
+            return response()->json([
+                'status' => true,
+                'data' => $news
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong: ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
     /* ===============================
@@ -141,22 +149,22 @@ public function show($id)
     /* ===============================
      * EDIT FORM
      * =============================== */
-public function edit($id)
-{
-    try {
-        $news = News::with('details.images')->findOrFail($id);
+    public function edit($id)
+    {
+        try {
+            $news = News::with('details.images')->findOrFail($id);
 
-        // Decode Summernote content if needed
-        $news->short_description = html_entity_decode($news->short_description);
+            // Decode Summernote content if needed
+            $news->short_description = html_entity_decode($news->short_description);
 
-        return view('backend.layouts.news.edit', compact('news'));
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Something went wrong: ' . $e->getMessage()
-        ], 500);
+            return view('backend.layouts.news.edit', compact('news'));
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong: ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
 

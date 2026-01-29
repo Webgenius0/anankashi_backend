@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\Frontend\SettingsController;
 use App\Http\Controllers\Api\Frontend\SocialLinksController;
 use App\Http\Controllers\Api\Frontend\SubscriberController;
+use App\Http\Controllers\api\NewsController;
 use App\Http\Controllers\Api\PrayerTimesController;
 use Illuminate\Support\Facades\Route;
 
@@ -143,6 +144,12 @@ Route::prefix('prayer-times')->group(function () {
     Route::get('/', [PrayerTimesController::class, 'index']);
     Route::get('/today', [PrayerTimesController::class, 'today']);
     Route::get('/methods', [PrayerTimesController::class, 'methods']);
+});
+Route::prefix('news')->group(function () {
+    Route::get('/', [NewsController::class, 'news']);
+    Route::get('/details', [NewsController::class, 'news_details']);
+    Route::post('/comment', [NewsController::class, 'addComment']);
+
 });
 
 Route::post('contact/store',[ContactController::class, 'store'])->name('contact.store');
