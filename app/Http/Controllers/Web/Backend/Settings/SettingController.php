@@ -47,7 +47,7 @@ class SettingController extends Controller
 
         try {
             $setting = Setting::first();
-            
+
             if ($request->hasFile('favicon')) {
                 if ($setting && $setting->favicon && file_exists(public_path($setting->favicon))) {
                     Helper::fileDelete(public_path($setting->favicon));
@@ -64,7 +64,7 @@ class SettingController extends Controller
 
             Setting::updateOrCreate(['id' => 1], $validatedData);
             return back()->with('t-success', 'Updated successfully');
-            
+
         } catch (Exception $e) {
             return back()->with('t-error', 'Failed to update' . $e->getMessage());
         }

@@ -74,9 +74,8 @@ if (!function_exists('settings')) {
         static $settings = null;
 
         if ($settings === null) {
-            $settings = Cache::rememberForever('settings', function () {
-                return Setting::first()?->toArray() ?? [];
-            });
+            $settings = Setting::first()?->toArray() ?? [];
+
         }
 
         return $key ? ($settings[$key] ?? null) : $settings;

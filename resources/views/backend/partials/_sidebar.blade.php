@@ -147,7 +147,7 @@
     <div class="app-sidebar" style="overflow: scroll">
         <div class="side-header">
             <a class="header-brand1" href="{{ route('admin.dashboard') }}">
-                <img src="{{ asset(settings('logo') ?? 'default/logo.svg') }}" id="header-brand-logo" alt="logo"
+                <img src="{{ asset(settings('thumbnail') ?? 'default/logo.svg') }}" id="header-brand-logo" alt="logo"
                     width="{{ settings('logo_width') ?? 67 }}" height="{{ settings('logo_height') ?? 67 }}">
             </a>
         </div>

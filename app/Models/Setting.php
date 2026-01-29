@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
+    
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
     public function getLogoAttribute($value): string | null
@@ -37,5 +38,5 @@ class Setting extends Model
         // Return only the path for web requests
         return $value;
     }
-    
+
 }
