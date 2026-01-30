@@ -18,7 +18,7 @@ class UserController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->select = ['id', 'first_name', 'last_name', 'phone', 'company_name', 'Chamber_of_Commerce_kvk_number', 'Chamber_of_Commerce', 'email', 'avatar', 'gender', 'dob', 'country', 'address'];
+        $this->select = ['id', 'first_name', 'last_name', 'phone', 'company_name', 'Chamber_of_Commerce_kvk_number', 'Chamber_of_Commerce', 'email', 'avatar', 'gender', 'dob', 'country', 'address','cover_image','x','linkedin'];
     }
 
     public function me()
@@ -27,64 +27,64 @@ class UserController extends Controller
         return Helper::jsonResponse(true, 'User details fetched successfully', 200, $data);
     }
 
-   public function updateProfile(Request $request)
-{
-    $user = auth('api')->user();
+    public function updateProfile(Request $request)
+    {
+        $user = auth('api')->user();
 
-    try {
-        // Validate the request
-        $validatedData = $request->validate([
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
-            'password' => 'nullable|string|min:6|confirmed',
-            'address' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'Chamber_of_Commerce' => 'nullable|string|max:255',
-            'Chamber_of_Commerce_kvk_number' => 'nullable|string|max:255',
-            'gender' => 'nullable|string|max:255',
-            'dob' => 'nullable|date',
-            'country' => 'nullable|string|max:255',
-            'company_name' => 'nullable|string|max:255',
-        ]);
+        try {
+            // Validate the request
+            $validatedData = $request->validate([
+                'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+                'password' => 'nullable|string|min:6|confirmed',
+                'address' => 'nullable|string|max:255',
+                'phone' => 'nullable|string|max:20',
+                'Chamber_of_Commerce' => 'nullable|string|max:255',
+                'Chamber_of_Commerce_kvk_number' => 'nullable|string|max:255',
+                'gender' => 'nullable|string|max:255',
+                'dob' => 'nullable|date',
+                'country' => 'nullable|string|max:255',
+                'company_name' => 'nullable|string|max:255',
+            ]);
 
-        // Fill all request fields directly into the user model
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
-        $user->phone = $request->phone;
-        $user->company_name = $request->company_name;
-        $user->Chamber_of_Commerce_kvk_number = $request->Chamber_of_Commerce_kvk_number;
-        $user->Chamber_of_Commerce = $request->Chamber_of_Commerce;
-        $user->address = $request->address;
-        $user->gender = $request->gender;
-        $user->dob = $request->dob;
-        $user->country = $request->country;
+            // Fill all request fields directly into the user model
+            $user->first_name = $request->first_name;
+            $user->last_name = $request->last_name;
+            $user->phone = $request->phone;
+            $user->company_name = $request->company_name;
+            $user->Chamber_of_Commerce_kvk_number = $request->Chamber_of_Commerce_kvk_number;
+            $user->Chamber_of_Commerce = $request->Chamber_of_Commerce;
+            $user->address = $request->address;
+            $user->gender = $request->gender;
+            $user->dob = $request->dob;
+            $user->country = $request->country;
 
-        // Handle password if provided
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-
-        // Handle avatar separately
-        if ($request->hasFile('avatar')) {  // Fixed typo: 'a1vatar' → 'avatar'
-            if ($user->avatar) {
-                Helper::fileDelete(public_path($user->getRawOriginal('avatar')));
+            // Handle password if provided
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
             }
-            $user->avatar = Helper::fileUpload(
-                $request->file('avatar'),
-                'user/avatar',
-                getFileName($request->file('avatar'))
-            );
-        }
 
-        // Save the user
-        $user->save();
+            // Handle avatar separately
+            if ($request->hasFile('avatar')) {  // Fixed typo: 'a1vatar' → 'avatar'
+                if ($user->avatar) {
+                    Helper::fileDelete(public_path($user->getRawOriginal('avatar')));
+                }
+                $user->avatar = Helper::fileUpload(
+                    $request->file('avatar'),
+                    'user/avatar',
+                    getFileName($request->file('avatar'))
+                );
+            }
 
-        // Return updated user data
-        $data = User::select($this->select)->find($user->id);
-        return Helper::jsonResponse(true, 'Profile updated successfully', 200, $data);
-    } catch (ValidationException $e) {
+            // Save the user
+            $user->save();
+
+            // Return updated user data
+            $data = User::select($this->select)->find($user->id);
+            return Helper::jsonResponse(true, 'Profile updated successfully', 200, $data);
+        } catch (ValidationException $e) {
             DB::rollBack();
 
-            return Helper::jsonErrorResponse($e->errors(), 422,$e->getMessage());
+            return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
         } catch (Throwable $e) {
             DB::rollBack();
 
@@ -93,54 +93,121 @@ class UserController extends Controller
                 500
             );
         }
-}
+    }
 
 
 
     public function updateAvatar(Request $request)
-{
-    try {
-        // Validate request
-        $validatedData = $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
-        ]);
+    {
+        try {
+            // Validate request
+            $validatedData = $request->validate([
+                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
+            ]);
 
-        $user = auth('api')->user();
+            $user = auth('api')->user();
 
-        // Delete old avatar if exists
-        if (!empty($user->avatar)) {
-            Helper::fileDelete(public_path($user->getRawOriginal('avatar')));
+            // Delete old avatar if exists
+            if (!empty($user->avatar)) {
+                Helper::fileDelete(public_path($user->getRawOriginal('avatar')));
+            }
+
+            // Upload new avatar
+            $validatedData['avatar'] = Helper::fileUpload(
+                $request->file('avatar'),
+                'user/avatar',
+                getFileName($request->file('avatar'))
+            );
+
+            // Update user
+            $user->update($validatedData);
+
+            $data = User::select($this->select)->find($user->id);
+
+            return response()->json([
+                'status'  => true,
+                'code'    => 200,
+                'message' => 'Avatar updated successfully',
+                'data'    => $data,
+            ], 200);
+        } catch (ValidationException $e) {
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
         }
-
-        // Upload new avatar
-        $validatedData['avatar'] = Helper::fileUpload(
-            $request->file('avatar'),
-            'user/avatar',
-            getFileName($request->file('avatar'))
-        );
-
-        // Update user
-        $user->update($validatedData);
-
-        $data = User::select($this->select)->find($user->id);
-
-        return response()->json([
-            'status'  => true,
-            'code'    => 200,
-            'message' => 'Avatar updated successfully',
-            'data'    => $data,
-        ], 200);
-
-    } catch (ValidationException $e) {
-        return Helper::jsonErrorResponse($e->errors(), 422);
-
-    } catch (Throwable $e) {
-        return Helper::jsonErrorResponse(
-            config('app.debug') ? $e->getMessage() : 'Internal server error',
-            500
-        );
     }
-}
+
+    public function update_cover_image(Request $request)
+    {
+        try {
+            // Validate request
+            $validatedData = $request->validate([
+                'cover_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
+            ]);
+
+            $user = auth('api')->user();
+
+            // Delete old avatar if exists
+            if (!empty($user->cover_image)) {
+                Helper::fileDelete(public_path($user->getRawOriginal('cover_image')));  // Fixed typo: 'a1vatar' → 'avatar'
+            }
+
+            // Upload new avatar
+            $validatedData['cover_image'] = Helper::fileUpload(
+                $request->file('cover_image'),
+                'user/cover_image',
+                getFileName($request->file('cover_image'))
+            );
+
+            // Update user
+            $user->update($validatedData);
+
+            $data = User::select($this->select)->find($user->id);
+
+            return response()->json([
+                'status'  => true,
+                'code'    => 200,
+                'message' => 'Cover image updated successfully',
+            ], 200);
+        } catch (ValidationException $e) {
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
+        }
+    }
+
+
+    public function update_link(Request $request)
+    {
+        try {
+            $request->validate([
+                'x_link' => 'required|url',
+                'linkedin_link' => 'required|url',
+            ]);
+
+            $user = auth('api')->user();
+            $user->x = $request->x_link;
+            $user->linkedin = $request->linkedin_link;
+            $user->save();
+            $data = User::select($this->select)->find($user->id);
+            return Helper::jsonResponse(true, 'Link updated successfully', 200);
+        } catch (ValidationException $e) {
+            return Helper::jsonErrorResponse($e->errors(), 422);
+        } catch (Throwable $e) {
+            return Helper::jsonErrorResponse(
+                config('app.debug') ? $e->getMessage() : 'Internal server error',
+                500
+            );
+        }
+    }
+
+
 
     public function delete()
     {

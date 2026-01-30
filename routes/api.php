@@ -89,6 +89,8 @@ Route::group(['middleware' => ['auth:api', 'api-otp']], function ($router) {
     Route::post('/update-avatar', [UserController::class, 'updateAvatar']);
     Route::delete('/delete-profile', [UserController::class, 'destroy']);
     Route::POST('/update-password', [ResetPasswordController::class, 'password_update']);
+    Route::post('/update-cover', [UserController::class, 'update_cover_image']);
+    Route::post('/update-link', [UserController::class, 'update_link']);
 });
 
 /*
