@@ -278,12 +278,7 @@ function initializeEditScripts() {
 
     // Remove detail row
     $(document).off('click', '.remove-detail').on('click', '.remove-detail', function() {
-
-
-            $(this).closest('.news-detail-row').remove();
-
-
-
+           $(this).closest('.news-detail-row').remove();
     });
 
     // Add new image input inside a detail
@@ -360,6 +355,7 @@ function bindDynamicEditEvents(detailIndexStart = 0) {
         $(this).closest('.input-group').remove();
     });
 }
+
 
 /* ================= VIEW ================= */
 function goToView(id) {

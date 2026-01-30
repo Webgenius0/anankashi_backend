@@ -47,7 +47,7 @@ class NewsController extends Controller
                     return '
         <button onclick="goToView(' . $row->id . ')" class="btn btn-sm btn-info">View</button>
         <button onclick="goToEdit(' . $row->id . ')" class="btn btn-sm btn-primary">Edit</button>
-        <button data-id="' . $row->id . '" class="btn btn-sm btn-danger delete">Delete</button>
+        <button onclick="showDeleteConfirm(' . $row->id . ')" class="btn btn-sm btn-danger delete">Delete</button>
     ';
                 })
 
@@ -235,7 +235,7 @@ class NewsController extends Controller
 
                 $newsDetail->images()
                     ->whereIn('id', $request->image_id ?? [])
-                    ->delete(); // one 
+                    ->delete(); // one
 
 
                 if (isset($detail['images'])) {
