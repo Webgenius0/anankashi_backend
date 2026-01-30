@@ -103,7 +103,7 @@ class NewsController extends Controller
             $readingTime = max(1, ceil($wordCount / 200));
             $newsData = [
                 'id' => $news->id,
-                'is_subscribed' => $news->is_subscribed,
+                'is_subscribed' => auth()->user()->is_subscribed,
                 'title' => $news->title,
                 'description' => $news->short_description,
                 'date' => $news->created_at->format('F d Y'),

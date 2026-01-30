@@ -225,11 +225,26 @@ class NewsController extends Controller
                 $newsDetail->description = $detail['description'];
                 $newsDetail->save();
 
-                // 3️⃣ Add new images for this detail
+                $paths = $newsDetail->images()
+                    ->whereIn('id', $request->image_id ?? [])
+                    ->pluck('image'); // one SELECT query
+
+                foreach ($paths as $path) {
+                    Helper::fileDelete(public_path($path));
+                }
+
+                $newsDetail->images()
+                    ->whereIn('id', $request->image_id ?? [])
+                    ->delete(); // one 
+
+
                 if (isset($detail['images'])) {
                     foreach ($detail['images'] as $image) {
                         $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                         $path = Helper::fileUpload($image, 'news_details', $imageName);
+
+
+                        // 3️⃣ Delete old images
 
                         $newsDetail->images()->create(['image' => $path]);
                     }
