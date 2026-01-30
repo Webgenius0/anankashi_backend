@@ -34,15 +34,8 @@ class User extends Authenticatable implements JWTSubject
 
     public function getCoverImageAttribute($value): string | null
     {
-        if (filter_var($value, FILTER_VALIDATE_URL)) {
-            return $value;
-        }
-        // Check if the request is an API request
-        if (request()->is('api/*') && !empty($value)) {
-            // Return the full URL for API requests
-            return url($value);
-        }
-        return url($value);
+
+        return $value ? url($value) : null;;
     }
 
     /**
