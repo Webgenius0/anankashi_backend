@@ -1,67 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Your Email Address</title>
-</head>
-
-<body
-    style="margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; background-color:#f4f4f4; line-height:1.6; color:#333333;">
-    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0"
-        style="background-color:#f4f4f4;">
+<body style="margin:0; padding:0; font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background-color:#f8f9fa;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding:40px 0;">
         <tr>
-            <td align="center" style="padding:30px 10px;">
-                <table role="presentation" width="600" border="0" cellspacing="0" cellpadding="0"
-                    style="max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #dddddd;">
+            <td align="center">
+                <!-- Container -->
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container"
+                    style="max-width:600px; width:100%; background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border:1px solid #eaeaea;">
+
                     <!-- Header -->
                     <tr>
-                        <td align="center" style="padding:30px 40px 20px; background-color:#2c3e50; color:#ffffff;">
-                            <h1 style="margin:0; font-size:24px; font-weight:bold;">{{ config('app.name') }}</h1>
-                            <div style="height:4px; width:60px; background-color:#4a90e2; margin:15px auto 0;"></div>
+                        {{-- @dd(settings('favicon')?? 'default/logo.svg') --}}
+                        <td align="center" style="padding:32px 25px 24px; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);">
+                            <img src="{{ settings('favicon') ?? 'default/logo.svg') }}"   alt="{{ config('app.name') }}"
+                                style="display:block; max-width:120px; height:auto; margin:0 auto;">
+                            <div style="height:4px; width:60px; background-color:#4a90e2; margin:20px auto 0;"></div>
                         </td>
                     </tr>
+
                     <!-- Content -->
                     <tr>
-                        <td style="padding:40px 40px 30px;">
-                            <p style="font-size:18px; margin:0 0 20px;">Hello {{ $user->username }},</p>
+                        <td align="center" style="padding:40px 40px 32px;" class="mobile-padding">
+                            <h1 style="margin:0 0 24px; color:#2c3e50; font-size:28px; font-weight:600; text-align:center; letter-spacing:-0.5px;">
+                                Welcome to {{ config('app.name') }}
+                            </h1>
 
-                            <p style="margin:0 0 20px;">Thank you for registering with {{ config('app.name') }}. To
-                                complete your registration and unlock full access, please verify your email address by
-                                clicking the button below.</p>
+                            <p style="margin:0 0 8px; color:#2c3e50; font-size:18px; font-weight:500; text-align:center;">
+                                Hello {{ $user->username }},
+                            </p>
 
-                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center"
-                                style="margin:30px auto;">
+                            <p style="margin:24px 0; color:#5a6c7d; font-size:16px; line-height:1.6; text-align:center; max-width:520px;">
+                                Thank you for registering your {{ config('app.name') }}. To complete your registration and access all features, please verify your email address by clicking the button below.
+                            </p>
+
+                            <!-- Button -->
+                            <table width="100%" cellspacing="0" cellpadding="0" style="margin:32px 0 40px;">
                                 <tr>
                                     <td align="center">
                                         <a href="{{ $verificationUrl }}"
-                                            style="background-color:#4a90e2; color:#ffffff; padding:16px 36px; border-radius:6px; font-weight:600; font-size:16px; text-decoration:none; display:inline-block;">
-                                            Verify My Email Address
+                                            style="background-color:#4a90e2; color:#ffffff; padding:16px 36px; border-radius:6px; cursor:pointer; font-weight:600; font-size:16px; text-decoration:none; display:inline-block; transition:all 0.3s ease; box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);">
+                                            Verify Email Address
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
-                            <p style="margin:0 0 20px; font-size:15px; color:#555555;">This verification link expires in
-                                <strong>24 hours</strong> for your security. If the button doesn't work, copy and paste
-                                this link into your browser:</p>
-                            <p style="margin:0 0 30px; font-size:14px; word-break:break-all; color:#0066cc;">
-                                {{ $verificationUrl }}</p>
+                            <!-- Info Box -->
+                            <table width="100%" cellspacing="0" cellpadding="0" style="margin:32px 0; background-color:#f8f9fa; border-radius:6px; border-left:4px solid #4a90e2;">
+                                <tr>
+                                    <td style="padding:20px 24px;">
+                                        <p style="margin:0; color:#5a6c7d; font-size:14px; line-height:1.5;">
+                                            <strong>Important:</strong> This verification link will expire in <strong style="color:#2c3e50;">24 hours</strong> for security purposes. If you did not create this account, please disregard this email.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
 
-                            <p style="margin:0 0 20px; font-size:15px; color:#555555;">If you didn't create an account
-                                with us, please ignore this email — no action is needed.</p>
+                            <!-- Support Info -->
 
-                            <p style="margin:30px 0 0; font-size:16px;">Best regards,<br>The {{ config('app.name') }}
-                                Team</p>
                         </td>
                     </tr>
+
+                    <!-- Footer -->
                     <tr>
-                        <td
-                            style="padding:20px 40px; background-color:#f8f8f8; font-size:13px; color:#777777; text-align:center; border-top:1px solid #dddddd;">
-                            <p style="margin:0 0 10px;">{{ config('app.name') }} • Education Platform</p>
-                            <p style="margin:10px 0 0;">This is an automated security message. Do not reply directly.
-                                For help, contact support@yourdomain.com</p>
+                        <td align="center" style="padding:28px 40px; font-size:13px; color:#7b8a9b; background-color:#f8f9fa; border-top:1px solid #eaeaea;">
+                            <p style="margin:0 0 12px;">
+                                &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
+                            </p>
+                            <p style="margin:0 0 16px; font-size:12px; color:#95a5a6; max-width:480px; line-height:1.5;">
+                                This is an automated message. Please do not reply to this email. If you have questions, contact our support team.
+                            </p>
+                            <p style="margin:0; font-size:12px; color:#95a5a6;">
+                                {{ config('app.name') }} • Education Platform
+                            </p>
                         </td>
                     </tr>
                 </table>
@@ -69,5 +78,3 @@
         </tr>
     </table>
 </body>
-
-</html>
