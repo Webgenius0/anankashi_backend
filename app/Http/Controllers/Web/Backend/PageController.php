@@ -84,9 +84,9 @@ class PageController extends Controller
         try {
             $validate['slug'] = Helper::makeSlug(Page::class, $validate['name']);
             Page::create($validate);
-            session()->put('t-success', 'Page created successfully');
+            return redirect()->route('admin.page.index')->with('t-success', 'Page created successfully');
         } catch (Exception $e) {
-            session()->put('t-error', $e->getMessage());
+            return redirect()->route('admin.page.index')->with('t-error', $e->getMessage());
         }
         return redirect()->route('admin.page.index')->with('t-success', 'Page created successfully');
     }
@@ -148,7 +148,7 @@ class PageController extends Controller
                 'status' => 't-success',
                 'message' => 'Your action was successful!'
             ]);
-            
+
         } catch (Exception $e) {
             return response()->json([
                 'status' => 't-error',
