@@ -128,9 +128,9 @@ class PageController extends Controller
         try {
             $page = Page::findOrFail($id);
             $page->update($validate);
-            session()->put('t-success', 'Page updated successfully');
+           return redirect()->route('admin.page.index')->with('t-success', 'Page updated successfully');
         } catch (Exception $e) {
-            session()->put('t-error', $e->getMessage());
+           return redirect()->route('admin.page.index')->with('t-error', $e->getMessage());
         }
 
         return redirect()->route('admin.page.index');
