@@ -28,7 +28,7 @@ class PageController extends Controller
     public function show($slug)
     {
         $page = Page::where('slug', $slug)
-            ->where('status', 'active')
+            ->where('status', 'active')->select('title',  'content')
             ->first();
 
         if ($page) {
