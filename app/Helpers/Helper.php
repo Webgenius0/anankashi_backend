@@ -94,7 +94,6 @@ class Helper
 
     public static function jsonErrorResponse($message = null, $code = null, $errors = 'Error'): JsonResponse
     {
-
         $arr = $message;
         $arryerrors = [];
 
@@ -116,7 +115,7 @@ class Helper
        }elseif($code == 404){
         $errors = 'Not Found';
        }elseif($code == 500){
-        $errors = 'Internal Server Error';
+        $errors = $message ;
        }
 
 

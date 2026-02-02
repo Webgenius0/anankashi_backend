@@ -67,8 +67,7 @@ class LoginController extends Controller
 
             //* Generate token if email is verified
             $token = auth('api')->login($user);
-dd($ttlMinutes = auth('api')->factory()->getTTL() // default 60
-);
+
             $data = User::select($this->select)->find(auth('api')->user()->id);
 
             return response()->json([
