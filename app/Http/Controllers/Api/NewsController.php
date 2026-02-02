@@ -398,7 +398,7 @@ class NewsController extends Controller
         return response()->json([
             'status' => true,
             'code' => 200,
-            'message' => 'News Type fetched successfully',
+            'message' => 'Most Popular news fetched successfully',
             'data' => $news->map(function ($newsType) {
                 return [
                     'id'          => $newsType->id,
