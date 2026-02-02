@@ -11,11 +11,19 @@ class RollbackNewsSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-  public function run(): void
+    public function run(): void
     {
         // Delete seeded data
-        DB::table('news_details_images')->truncate();
-        DB::table('news_details')->truncate();
-        DB::table('news')->truncate();
+
+        // Get all news records
+        $images = DB::table('news')->get();
+
+        foreach ($images as $image) {
+            DB::table('news')
+                ->where('id', $image->id)
+                ->update([
+                    'thumbnail' => 'uploads/news/photo_2026-01-28_18-23-14.jpg'
+                ]);
+        }
     }
 }
