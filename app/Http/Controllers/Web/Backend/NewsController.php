@@ -20,7 +20,7 @@ class NewsController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = News::latest();
+            $data = DB::table('news')->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()
