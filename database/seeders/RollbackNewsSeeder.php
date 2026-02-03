@@ -27,8 +27,17 @@ class RollbackNewsSeeder extends Seeder
 
             $users = DB::table('users')->get();
 
-            foreach ($users->take(5)->skip(5) as $user) {
+            foreach ($users->slice(5, 5) as $user) {
                 DB::table('likes')
+                    ->insert([
+                        'user_id' => $user->id,
+                        'news_id' => $news->id,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+            }
+            foreach ($users->slice(0, 5) as $user) {
+                DB::table('news_dislikes')
                     ->insert([
                         'user_id' => $user->id,
                         'news_id' => $news->id,
@@ -48,15 +57,6 @@ class RollbackNewsSeeder extends Seeder
                     ]);
             }
 
-            foreach ($users->take(5) as $user) {
-                DB::table('news_dislikes')
-                    ->insert([
-                        'user_id' => $user->id,
-                        'news_id' => $news->id,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
-            }
 
             $newsDetails = DB::table('news_details')
                 ->where('news_id', $news->id)
