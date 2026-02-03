@@ -42,15 +42,7 @@ class NewsSeeder extends Seeder
                 ]);
 
                 // Each detail has 2-4 images
-                $imagesCount = rand(2, 4);
-                for ($k = 1; $k <= $imagesCount; $k++) {
-                    DB::table('news_details_images')->insert([
-                        'news_details_id' => $newsDetailId,
-                        'image' => "news_detail_{$newsDetailId}_image_$k.jpg",
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
+                
             }
         }
 
