@@ -18,7 +18,7 @@ class RollbackNewsSeeder extends Seeder
         $newsItems = DB::table('news')->get();
 
         foreach ($newsItems as $news) {
-            
+
             DB::table('news')
                 ->where('id', $news->id)
                 ->update([

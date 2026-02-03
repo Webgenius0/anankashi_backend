@@ -42,7 +42,7 @@ class NewsSeeder extends Seeder
                 ]);
 
                 // Each detail has 2-4 images
-                
+
             }
         }
 
