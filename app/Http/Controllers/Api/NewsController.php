@@ -108,6 +108,7 @@ class NewsController extends Controller
                 'id' => $news->id,
                 'is_subscribed' => auth()->user()->is_subscribed,
                 'title' => $news->title,
+                'type' => $news->type,
                 'description' => $news->short_description,
                 'date' => $news->created_at->format('F d Y'),
                 'reading_time' => $readingTime . ' min read',
