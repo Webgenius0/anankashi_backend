@@ -18,7 +18,7 @@ class UserController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->select = ['id', 'first_name', 'last_name', 'phone', 'company_name', 'Chamber_of_Commerce_kvk_number', 'Chamber_of_Commerce', 'email', 'avatar', 'gender', 'dob', 'country', 'address','cover_image','x','linkedin'];
+        $this->select = ['id', 'first_name', 'last_name', 'phone', 'company_name', 'Chamber_of_Commerce_kvk_number', 'Chamber_of_Commerce', 'email', 'avatar', 'gender', 'dob', 'country', 'address','cover_image','x','linkedin','is_subscribed'];
     }
 
     public function me()

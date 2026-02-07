@@ -126,16 +126,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.369.27",
+            "version": "3.369.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "f844afab2a74eb3cf881970a9c31de460510eb74"
+                "reference": "068195b2980cf5cf4ade2515850d461186db3310"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/f844afab2a74eb3cf881970a9c31de460510eb74",
-                "reference": "f844afab2a74eb3cf881970a9c31de460510eb74",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/068195b2980cf5cf4ade2515850d461186db3310",
+                "reference": "068195b2980cf5cf4ade2515850d461186db3310",
                 "shasum": ""
             },
             "require": {
@@ -217,9 +217,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.369.27"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.369.29"
             },
-            "time": "2026-02-04T19:07:08+00:00"
+            "time": "2026-02-06T19:08:50+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -628,16 +628,16 @@
         },
         {
             "name": "brick/math",
-            "version": "0.14.5",
+            "version": "0.14.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "618a8077b3c326045e10d5788ed713b341fcfe40"
+                "reference": "32498d5e1897e7642c0b961ace2df6d7dc9a3bc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/618a8077b3c326045e10d5788ed713b341fcfe40",
-                "reference": "618a8077b3c326045e10d5788ed713b341fcfe40",
+                "url": "https://api.github.com/repos/brick/math/zipball/32498d5e1897e7642c0b961ace2df6d7dc9a3bc3",
+                "reference": "32498d5e1897e7642c0b961ace2df6d7dc9a3bc3",
                 "shasum": ""
             },
             "require": {
@@ -676,7 +676,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.14.5"
+                "source": "https://github.com/brick/math/tree/0.14.6"
             },
             "funding": [
                 {
@@ -684,7 +684,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-03T18:06:51+00:00"
+            "time": "2026-02-05T07:59:58+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -4654,16 +4654,16 @@
         },
         {
             "name": "livewire/livewire",
-            "version": "v3.7.8",
+            "version": "v3.7.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "06ec7e8cd61bb01739b8f26396db6fe73b7e0607"
+                "reference": "112b27e41e87e89d828a96e37b257aff2a058c7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/06ec7e8cd61bb01739b8f26396db6fe73b7e0607",
-                "reference": "06ec7e8cd61bb01739b8f26396db6fe73b7e0607",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/112b27e41e87e89d828a96e37b257aff2a058c7a",
+                "reference": "112b27e41e87e89d828a96e37b257aff2a058c7a",
                 "shasum": ""
             },
             "require": {
@@ -4718,7 +4718,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v3.7.8"
+                "source": "https://github.com/livewire/livewire/tree/v3.7.9"
             },
             "funding": [
                 {
@@ -4726,7 +4726,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-03T02:57:56+00:00"
+            "time": "2026-02-05T23:27:27+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -5436,16 +5436,16 @@
         },
         {
             "name": "nuwave/lighthouse",
-            "version": "v6.64.2",
+            "version": "v6.64.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nuwave/lighthouse.git",
-                "reference": "e3a8509fddc248740afe30022173a6fa8d78d585"
+                "reference": "ab6990d52c3992548784d0a14be3b0c7f5631626"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nuwave/lighthouse/zipball/e3a8509fddc248740afe30022173a6fa8d78d585",
-                "reference": "e3a8509fddc248740afe30022173a6fa8d78d585",
+                "url": "https://api.github.com/repos/nuwave/lighthouse/zipball/ab6990d52c3992548784d0a14be3b0c7f5631626",
+                "reference": "ab6990d52c3992548784d0a14be3b0c7f5631626",
                 "shasum": ""
             },
             "require": {
@@ -5562,7 +5562,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2026-01-13T16:06:47+00:00"
+            "time": "2026-02-05T08:59:33+00:00"
         },
         {
             "name": "nwidart/laravel-modules",
@@ -10798,16 +10798,16 @@
         },
         {
             "name": "twilio/sdk",
-            "version": "8.10.1",
+            "version": "8.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twilio/twilio-php",
-                "reference": "84fc8e4b2b5ff32d20e73b17718b13e5ed56bc8c"
+                "reference": "e3b9248f556ed522ce841ba2b7e9228ff1c8276a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/84fc8e4b2b5ff32d20e73b17718b13e5ed56bc8c",
-                "reference": "84fc8e4b2b5ff32d20e73b17718b13e5ed56bc8c",
+                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/e3b9248f556ed522ce841ba2b7e9228ff1c8276a",
+                "reference": "e3b9248f556ed522ce841ba2b7e9228ff1c8276a",
                 "shasum": ""
             },
             "require": {
@@ -10844,7 +10844,7 @@
                 "sms",
                 "twilio"
             ],
-            "time": "2026-01-07T09:28:54+00:00"
+            "time": "2026-02-05T12:32:52+00:00"
         },
         {
             "name": "tymon/jwt-auth",
@@ -11090,16 +11090,16 @@
         },
         {
             "name": "webonyx/graphql-php",
-            "version": "v15.30.1",
+            "version": "v15.30.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webonyx/graphql-php.git",
-                "reference": "12175bc314f0adc1f3e77f7efd0c8cd24f69b483"
+                "reference": "abf6dc5f8b27915bfde26fdda0e92cebfb9aebf5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/12175bc314f0adc1f3e77f7efd0c8cd24f69b483",
-                "reference": "12175bc314f0adc1f3e77f7efd0c8cd24f69b483",
+                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/abf6dc5f8b27915bfde26fdda0e92cebfb9aebf5",
+                "reference": "abf6dc5f8b27915bfde26fdda0e92cebfb9aebf5",
                 "shasum": ""
             },
             "require": {
@@ -11117,7 +11117,7 @@
                 "nyholm/psr7": "^1.5",
                 "phpbench/phpbench": "^1.2",
                 "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "2.1.37",
+                "phpstan/phpstan": "2.1.38",
                 "phpstan/phpstan-phpunit": "2.0.12",
                 "phpstan/phpstan-strict-rules": "2.0.8",
                 "phpunit/phpunit": "^9.5 || ^10.5.21 || ^11",
@@ -11153,7 +11153,7 @@
             ],
             "support": {
                 "issues": "https://github.com/webonyx/graphql-php/issues",
-                "source": "https://github.com/webonyx/graphql-php/tree/v15.30.1"
+                "source": "https://github.com/webonyx/graphql-php/tree/v15.30.2"
             },
             "funding": [
                 {
@@ -11161,7 +11161,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-01-29T15:14:01+00:00"
+            "time": "2026-02-05T16:03:59+00:00"
         },
         {
             "name": "wikimedia/composer-merge-plugin",
@@ -12780,16 +12780,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.5.50",
+            "version": "11.5.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "fdfc727f0fcacfeb8fcb30c7e5da173125b58be3"
+                "reference": "ad14159f92910b0f0e3928c13e9b2077529de091"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fdfc727f0fcacfeb8fcb30c7e5da173125b58be3",
-                "reference": "fdfc727f0fcacfeb8fcb30c7e5da173125b58be3",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ad14159f92910b0f0e3928c13e9b2077529de091",
+                "reference": "ad14159f92910b0f0e3928c13e9b2077529de091",
                 "shasum": ""
             },
             "require": {
@@ -12804,7 +12804,7 @@
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.2",
                 "phpunit/php-code-coverage": "^11.0.12",
-                "phpunit/php-file-iterator": "^5.1.0",
+                "phpunit/php-file-iterator": "^5.1.1",
                 "phpunit/php-invoker": "^5.0.1",
                 "phpunit/php-text-template": "^4.0.1",
                 "phpunit/php-timer": "^7.0.1",
@@ -12816,6 +12816,7 @@
                 "sebastian/exporter": "^6.3.2",
                 "sebastian/global-state": "^7.0.2",
                 "sebastian/object-enumerator": "^6.0.1",
+                "sebastian/recursion-context": "^6.0.3",
                 "sebastian/type": "^5.1.3",
                 "sebastian/version": "^5.0.2",
                 "staabm/side-effects-detector": "^1.0.5"
@@ -12861,7 +12862,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.50"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.51"
             },
             "funding": [
                 {
@@ -12885,7 +12886,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-27T05:59:18+00:00"
+            "time": "2026-02-05T07:59:30+00:00"
         },
         {
             "name": "sebastian/cli-parser",
