@@ -71,6 +71,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'otp_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_subscribed' => 'boolean',
         ];
     }
 
