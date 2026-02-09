@@ -273,7 +273,7 @@ class NewsController extends Controller
         ], 400);
     }
 
-    $authUserId = auth()->id(); // 🔥 logged-in API user
+    $authUserId = auth('api')->id(); // 🔥 logged-in API user
 
     $comments = Comment::with(['user', 'replies.user'])
         ->where('news_id', $newsId)
@@ -284,7 +284,7 @@ class NewsController extends Controller
         return [
             'id' => $comment->id,
             'user_id' => $comment->user_id,
-            'is_mine' => $authUserId && $comment->user_id == $authUserId, // ✅
+            'is_mine' =>  $comment->user_id == $authUserId ? true : false, // ✅
             'avatar' => $comment->user?->avatar ? url($comment->user->avatar) : null,
             'name' => $comment->user?->name,
             'comment' => $comment->comment,
@@ -294,7 +294,7 @@ class NewsController extends Controller
                 return [
                     'id' => $reply->id,
                     'user_id' => $reply->user_id,
-                    'is_mine' => $authUserId && $reply->user_id == $authUserId, // ✅
+                    'is_mine' =>  $reply->user_id == $authUserId ? true : false, // ✅
                     'avatar' => $reply->user?->avatar ? url($reply->user->avatar) : null,
                     'name' => $reply->user?->name,
                     'reply' => $reply->comment,
