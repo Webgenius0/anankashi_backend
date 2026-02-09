@@ -16,19 +16,22 @@ class RollbackNewsSeeder extends Seeder
     {
         // Get all news records
         $newsItems = DB::table('news')->get();
-        DB::table(['likes', 'news_dislikes', 'comments'])->delete();
+        DB::table('likes')->truncate();
+        DB::table('news_dislikes')->truncate();
+        DB::table('comments')->truncate();
+
 
         foreach ($newsItems as $news) {
 
             DB::table('news')
-            ->where('id', $news->id)
-            ->update([
-                'thumbnail' => 'uploads/news/photo_2026-01-28_18-23-14.jpg'
+                ->where('id', $news->id)
+                ->update([
+                    'thumbnail' => 'uploads/news/photo_2026-01-28_18-23-14.jpg'
                 ]);
-                $users = DB::table('users')->get();
+            $users = DB::table('users')->get();
 
 
-            $users->random(rand(1,$users->count()))->each(function ($user) use ($news) {
+            $users->random(rand(1, $users->count()))->each(function ($user) use ($news) {
                 DB::table('likes')->insert([
                     'user_id'    => $user->id,
                     'news_id'    => $news->id,
@@ -38,7 +41,7 @@ class RollbackNewsSeeder extends Seeder
             });
 
 
-            $users->random(rand(1,$users->count()))->each(function ($user) use ($news) {
+            $users->random(rand(1, $users->count()))->each(function ($user) use ($news) {
                 DB::table('news_dislikes')->insert([
                     'user_id'    => $user->id,
                     'news_id'    => $news->id,
