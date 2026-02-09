@@ -135,6 +135,12 @@ class NewsController extends Controller
                     }
                 }
             }
+            \DB::listen(function ($query) {
+    if (str_contains($query->sql, 'comments')) {
+        dd($query->sql, $query->bindings);
+    }
+});
+
             DB::commit();
             return redirect()->route('admin.news.index')->with('t-success', 'News, details, and images created successfully');
         } catch (ValidationException $e) {
