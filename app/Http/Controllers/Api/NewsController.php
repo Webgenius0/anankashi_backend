@@ -261,55 +261,63 @@ class NewsController extends Controller
 
 
     public function comments(Request $request)
-    {
-        $page    = $request->input('current_page', 1);
-        $perPage = $request->input('per_page', 10);
-        $newsId  = $request->input('news_id');
-        if (!$newsId) {
-            return response()->json([
-                'status' => false,
-                'message' => 'News ID is required',
-            ], 400);
-        }
-        $comments = Comment::with(['user', 'replies.user'])
-            ->where('news_id', $newsId)
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage, ['*'], 'page', $page);
+{
+    $page    = $request->input('current_page', 1);
+    $perPage = $request->input('per_page', 10);
+    $newsId  = $request->input('news_id');
 
-        $data = $comments->map(function ($comment) {
-            return [
-                'id' => $comment->id,
-                'user_id' => $comment->user_id,
-                'avatar' => $comment->user?->avatar ? url($comment->user->avatar) : null,
-                'name' => $comment->user?->name,
-                'comment' => $comment->comment,
-                'commented_at' => $comment->created_at->diffForHumans(),
-                'replies' => $comment->replies->map(function ($reply) {
-                    return [
-                        'id' => $reply->id,
-                        'user_id' => $reply->user_id,
-                        'avatar' => $reply->user?->avatar ? url($reply->user->avatar) : null,
-                        'name' => $reply->user?->name,
-                        'reply' => $reply->comment,
-                        'commented_at' => $reply->created_at->diffForHumans(),
-                    ];
-                })->values(),
-            ];
-        });
-
+    if (!$newsId) {
         return response()->json([
-            'status' => true,
-            'code' => 200,
-            'message' => 'Comments fetched successfully',
-            'data' => $data, // actual  data
-            'pagination' => [
-                'total_page'   => $comments->lastPage(),
-                'per_page'     => $comments->perPage(),
-                'total_item'   => $comments->total(),
-                'current_page' => $comments->currentPage(),
-            ],
-        ]);
+            'status' => false,
+            'message' => 'News ID is required',
+        ], 400);
     }
+
+    $authUserId = auth()->id(); // 🔥 logged-in API user
+
+    $comments = Comment::with(['user', 'replies.user'])
+        ->where('news_id', $newsId)
+        ->orderBy('created_at', 'desc')
+        ->paginate($perPage, ['*'], 'page', $page);
+
+    $data = $comments->map(function ($comment) use ($authUserId) {
+        return [
+            'id' => $comment->id,
+            'user_id' => $comment->user_id,
+            'is_mine' => $authUserId && $comment->user_id == $authUserId, // ✅
+            'avatar' => $comment->user?->avatar ? url($comment->user->avatar) : null,
+            'name' => $comment->user?->name,
+            'comment' => $comment->comment,
+            'commented_at' => $comment->created_at->diffForHumans(),
+
+            'replies' => $comment->replies->map(function ($reply) use ($authUserId) {
+                return [
+                    'id' => $reply->id,
+                    'user_id' => $reply->user_id,
+                    'is_mine' => $authUserId && $reply->user_id == $authUserId, // ✅
+                    'avatar' => $reply->user?->avatar ? url($reply->user->avatar) : null,
+                    'name' => $reply->user?->name,
+                    'reply' => $reply->comment,
+                    'commented_at' => $reply->created_at->diffForHumans(),
+                ];
+            })->values(),
+        ];
+    });
+
+    return response()->json([
+        'status' => true,
+        'code' => 200,
+        'message' => 'Comments fetched successfully',
+        'data' => $data,
+        'pagination' => [
+            'total_page'   => $comments->lastPage(),
+            'per_page'     => $comments->perPage(),
+            'total_item'   => $comments->total(),
+            'current_page' => $comments->currentPage(),
+        ],
+    ]);
+}
+
 
     public function news_type(Request $request)
     {
