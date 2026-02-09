@@ -157,139 +157,160 @@ class NewsController extends Controller
     }
 
 
-    public function addComment(Request $request)
-    {
-        try {
+   public function addComment(Request $request)
+{
+    try {
+        $request->validate([
+            'slug'    => 'required|string|exists:news,slug', // validate slug instead of news_id
+            'comment' => 'required|string|min:3',
+        ]);
 
-            $request->validate([
-                'news_id' => 'required|exists:news,id',
-                'comment' => 'required|string|min:3'
-            ]);
-
-            $comment = Comment::create([
-                'news_id' => $request->news_id,
-                'user_id' => auth('api')->id(),
-                'parent_id' => $request->parent_id ?? null,
-                'comment' => $request->comment,
-            ]);
-
+        // Find the news by slug
+        $news = News::where('slug', $request->slug)->first();
+        if (!$news) {
             return response()->json([
-                'status' => true,
-                'code' => 200,
-                'message' => 'Comment added successfully',
-            ]);
-        } catch (ValidationException $e) {
-            DB::rollBack();
-
-            return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
-        } catch (Throwable $e) {
-            DB::rollBack();
-
-            return Helper::jsonErrorResponse(
-                config('app.debug') ? $e->getMessage() : 'Internal server error',
-                500
-            );
+                'status' => false,
+                'message' => 'News not found',
+            ], 404);
         }
+
+        // Create the comment
+        $comment = Comment::create([
+            'news_id'   => $news->id, // use news ID internally
+            'user_id'   => auth('api')->id(),
+            'parent_id' => $request->parent_id ?? null,
+            'comment'   => $request->comment,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'code'   => 200,
+            'message' => 'Comment added successfully',
+        ]);
+
+    } catch (ValidationException $e) {
+        return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
+    } catch (Throwable $e) {
+        return Helper::jsonErrorResponse(
+            config('app.debug') ? $e->getMessage() : 'Internal server error',
+            500
+        );
     }
+}
 
-    public function reaction(Request $request)
-    {
-        try {
-            $request->validate([
-                'news_id' => 'required|exists:news,id',
-                'action'  => 'required|in:like,dislike',
-            ]);
+   public function reaction(Request $request)
+{
+    try {
+        $request->validate([
+            'slug'   => 'required|string|exists:news,slug', // validate slug
+            'action' => 'required|in:like,dislike',
+        ]);
 
-            $userId = auth('api')->id();
-            $newsId = $request->news_id;
+        $userId = auth('api')->id();
+        $slug = $request->slug;
 
-            if ($request->action === 'like') {
-                Dislike::where('user_id', $userId)
-                    ->where('news_id', $newsId)
-                    ->delete();
+        // Find the news by slug
+        $news = News::where('slug', $slug)->firstOrFail();
+        $newsId = $news->id;
 
-                $like = Like::where('user_id', $userId)
-                    ->where('news_id', $newsId)
-                    ->first();
+        if ($request->action === 'like') {
+            // Remove existing dislike if any
+            Dislike::where('user_id', $userId)
+                ->where('news_id', $newsId)
+                ->delete();
 
-                if ($like) {
-                    $like->delete();
-                    $status = 'unliked';
-                } else {
-                    Like::create([
-                        'news_id' => $newsId,
-                        'user_id' => $userId,
-                    ]);
-                    $status = 'liked';
-                }
+            // Check if user already liked
+            $like = Like::where('user_id', $userId)
+                ->where('news_id', $newsId)
+                ->first();
+
+            if ($like) {
+                $like->delete();
+                $status = 'unliked';
+            } else {
+                Like::create([
+                    'news_id' => $newsId,
+                    'user_id' => $userId,
+                ]);
+                $status = 'liked';
             }
-
-            if ($request->action === 'dislike') {
-                Like::where('user_id', $userId)
-                    ->where('news_id', $newsId)
-                    ->delete();
-
-                $dislike = Dislike::where('user_id', $userId)
-                    ->where('news_id', $newsId)
-                    ->first();
-
-                if ($dislike) {
-                    $dislike->delete();
-                    $status = 'undisliked';
-                } else {
-                    Dislike::create([
-                        'news_id' => $newsId,
-                        'user_id' => $userId,
-                    ]);
-                    $status = 'disliked';
-                }
-            }
-
-            return response()->json([
-                'status' => true,
-                'code'   => 200,
-
-            ]);
-        } catch (ValidationException $e) {
-            return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
-        } catch (Throwable $e) {
-            return Helper::jsonErrorResponse(
-                config('app.debug') ? $e->getMessage() : 'Internal server error',
-                500
-            );
         }
+
+        if ($request->action === 'dislike') {
+            // Remove existing like if any
+            Like::where('user_id', $userId)
+                ->where('news_id', $newsId)
+                ->delete();
+
+            // Check if user already disliked
+            $dislike = Dislike::where('user_id', $userId)
+                ->where('news_id', $newsId)
+                ->first();
+
+            if ($dislike) {
+                $dislike->delete();
+                $status = 'undisliked';
+            } else {
+                Dislike::create([
+                    'news_id' => $newsId,
+                    'user_id' => $userId,
+                ]);
+                $status = 'disliked';
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'code'   => 200,
+            'reaction_status' => $status,
+        ]);
+
+    } catch (ValidationException $e) {
+        return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
+    } catch (Throwable $e) {
+        return Helper::jsonErrorResponse(
+            config('app.debug') ? $e->getMessage() : 'Internal server error',
+            500
+        );
     }
+}
 
 
-    public function comments(Request $request)
+ public function comments(Request $request)
 {
     $page    = $request->input('current_page', 1);
     $perPage = $request->input('per_page', 10);
-    $newsId  = $request->input('news_id');
+    $slug    = $request->input('slug');
 
-    if (!$newsId) {
+    if (!$slug) {
         return response()->json([
             'status' => false,
-            'message' => 'News ID is required',
+            'message' => 'News slug is required',
         ], 400);
     }
 
-    $authUserId = auth('api')->id(); // 🔥 logged-in API user
+    // Find news by slug
+    $news = News::where('slug', $slug)->first();
+    if (!$news) {
+        return response()->json([
+            'status' => false,
+            'message' => 'News not found',
+        ], 404);
+    }
+
+    $authUserId = auth('api')->id(); // logged-in API user
 
     $comments = Comment::with(['user', 'replies.user'])
-        ->where('news_id', $newsId)
+        ->where('news_id', $news->id) // use news ID internally
         ->orderBy('created_at', 'desc')
         ->paginate($perPage, ['*'], 'page', $page);
-
-
 
     $data = $comments->where('parent_id', null)->map(function ($comment) use ($authUserId) {
         return [
             'id' => $comment->id,
             'user_id' => $comment->user_id,
-            'is_mine' =>  $comment->user_id == $authUserId ? true : false,
+            'is_mine' => $comment->user_id == $authUserId,
             'is_liked' => $comment->likes()->where('user_id', $authUserId)->exists(),
-             // ✅
             'avatar' => $comment->user?->avatar ? url($comment->user->avatar) : null,
             'name' => $comment->user?->name,
             'comment' => $comment->comment,
@@ -299,9 +320,8 @@ class NewsController extends Controller
                 return [
                     'id' => $reply->id,
                     'user_id' => $reply->user_id,
-                    'is_mine' =>  $reply->user_id == $authUserId ? true : false,
+                    'is_mine' => $reply->user_id == $authUserId,
                     'is_liked' => $reply->likes()->where('user_id', $authUserId)->exists(),
-                     // ✅
                     'avatar' => $reply->user?->avatar ? url($reply->user->avatar) : null,
                     'name' => $reply->user?->name,
                     'reply' => $reply->comment,
@@ -324,6 +344,7 @@ class NewsController extends Controller
         ],
     ]);
 }
+
 
 
     public function news_type(Request $request)
