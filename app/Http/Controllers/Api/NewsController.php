@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\CommentLike;
 use App\Models\Dislike;
 use App\Models\Like;
 use App\Models\News;
@@ -280,11 +281,15 @@ class NewsController extends Controller
         ->orderBy('created_at', 'desc')
         ->paginate($perPage, ['*'], 'page', $page);
 
+
+
     $data = $comments->map(function ($comment) use ($authUserId) {
         return [
             'id' => $comment->id,
             'user_id' => $comment->user_id,
-            'is_mine' =>  $comment->user_id == $authUserId ? true : false, // ✅
+            'is_mine' =>  $comment->user_id == $authUserId ? true : false,
+            'is_liked' => $comment->likes()->where('user_id', $authUserId)->exists(),
+             // ✅
             'avatar' => $comment->user?->avatar ? url($comment->user->avatar) : null,
             'name' => $comment->user?->name,
             'comment' => $comment->comment,
@@ -294,7 +299,9 @@ class NewsController extends Controller
                 return [
                     'id' => $reply->id,
                     'user_id' => $reply->user_id,
-                    'is_mine' =>  $reply->user_id == $authUserId ? true : false, // ✅
+                    'is_mine' =>  $reply->user_id == $authUserId ? true : false,
+                    'is_liked' => $reply->likes()->where('user_id', $authUserId)->exists(),
+                     // ✅
                     'avatar' => $reply->user?->avatar ? url($reply->user->avatar) : null,
                     'name' => $reply->user?->name,
                     'reply' => $reply->comment,
@@ -399,4 +406,117 @@ class NewsController extends Controller
     ]);
 }
 
+public function edit_comment(Request $request)
+{
+    try {
+
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id',
+            'comment' => 'required|string|min:3'
+        ]);
+
+
+        // Find the comment
+        $comment = Comment::find($request->input('comment_id'));
+        if (!$comment) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Comment not found',
+            ], 404);
+        }
+
+        // Update the comment
+        $comment->comment = $request->input('comment');
+        $comment->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Comment updated successfully',
+        ]);
+
+    } catch (ValidationException $e) {
+        return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
+    } catch (Throwable $e) {
+        return Helper::jsonErrorResponse(
+            config('app.debug') ? $e->getMessage() : 'Internal server error',
+            500
+        );
+    }
+}
+
+
+public function delete_comment(Request $request)
+{
+    try {
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id',
+        ]);
+
+        $comment = Comment::find($request->input('comment_id'));
+        if (!$comment) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Comment not found',
+            ], 404);
+        }
+
+        $comment->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Comment deleted successfully',
+        ]);
+    } catch (ValidationException $e) {
+        return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
+    } catch (Throwable $e) {
+        return Helper::jsonErrorResponse(
+            config('app.debug') ? $e->getMessage() : 'Internal server error',
+            500
+        );
+    }
+}
+
+public function like_comment(Request $request)
+{
+    try {
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id',
+        ]);
+
+        $commentId = $request->input('comment_id');
+        $userId = auth('api')->id();
+
+        // Check if the user has already liked the comment
+        $existingLike = CommentLike::where('comment_id', $commentId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($existingLike) {
+            // If the like already exists, remove it (unlike)
+            $existingLike->delete();
+            $status = 'unliked';
+        } else {
+            // Otherwise, create a new like
+            CommentLike::create([
+                'comment_id' => $commentId,
+                'user_id' => $userId,
+            ]);
+            $status = 'liked';
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Comment {$status} successfully",
+        ]);
+    } catch (ValidationException $e) {
+        return Helper::jsonErrorResponse($e->errors(), 422, $e->getMessage());
+    } catch (Throwable $e) {
+        return Helper::jsonErrorResponse(
+            config('app.debug') ? $e->getMessage() : 'Internal server error',
+            500
+        );
+    }
+
+
+}
 }

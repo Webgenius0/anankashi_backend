@@ -48,4 +48,11 @@ class Comment extends Model
     {
         return $this->morphMany(Reach::class, 'reachable');
     }
+
+    public function likes()
+    {
+        return $this->hasMany(CommentLike::class);
+    }
+
+
 }
