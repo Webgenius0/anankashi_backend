@@ -283,7 +283,7 @@ class NewsController extends Controller
 
 
 
-    $data = $comments->map(function ($comment) use ($authUserId) {
+    $data = $comments->where('parent_id', null)->map(function ($comment) use ($authUserId) {
         return [
             'id' => $comment->id,
             'user_id' => $comment->user_id,
@@ -309,7 +309,7 @@ class NewsController extends Controller
                 ];
             })->values(),
         ];
-    });
+    })->values();
 
     return response()->json([
         'status' => true,
