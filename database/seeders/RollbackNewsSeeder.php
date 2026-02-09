@@ -27,7 +27,7 @@ class RollbackNewsSeeder extends Seeder
 
             $users = DB::table('users')->get();
 
-            DB::table('news_likes')->delete();
+            DB::table('likes')->delete();
             $users->random(rand(1,$users->count()))->each(function ($user) use ($news) {
                 DB::table('likes')->insert([
                     'user_id'    => $user->id,
