@@ -16,9 +16,9 @@ class RollbackNewsSeeder extends Seeder
     {
         // Get all news records
         $newsItems = DB::table('news')->get();
-        DB::table('likes')->truncate();
-        DB::table('news_dislikes')->truncate();
-        DB::table('comments')->truncate();
+        DB::table('likes')->delete();
+        DB::table('news_dislikes')->delete();
+        DB::table('comments')->delete();
 
 
         foreach ($newsItems as $news) {
