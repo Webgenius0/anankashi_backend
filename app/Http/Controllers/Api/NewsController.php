@@ -299,16 +299,15 @@ class NewsController extends Controller
         $authUserId = auth('api')->id();
 
         $comments = Comment::with([
-            'user',
-            'replies.user',
-            'replies.replies.user'
+            'user',                    // Step 1
+            'replies.user',            // Step 2
+            'replies.replies.user'     // Step 3
         ])
             ->where('news_id', $news->id)
             ->whereNull('parent_id')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
-
-        $transformedData = $comments->getCollection()->map(function ($comment) use ($authUserId) {
+        $data = $comments->map(function ($comment) use ($authUserId) {
             return [
                 'id' => $comment->id,
                 'user_id' => $comment->user_id,
@@ -318,6 +317,7 @@ class NewsController extends Controller
                 'name' => $comment->user?->name,
                 'comment' => $comment->comment,
                 'commented_at' => $comment->created_at->diffForHumans(),
+
                 'replies' => $comment->replies->map(function ($reply) use ($authUserId) {
                     return [
                         'id' => $reply->id,
@@ -328,6 +328,9 @@ class NewsController extends Controller
                         'name' => $reply->user?->name,
                         'comment' => $reply->comment,
                         'commented_at' => $reply->created_at->diffForHumans(),
+
+                        // ✅ Sub-replies (2nd level)
+
                         'replies' => $reply->replies->map(function ($subReply) use ($authUserId) {
                             return [
                                 'id' => $subReply->id,
@@ -345,14 +348,11 @@ class NewsController extends Controller
             ];
         })->values();
 
-        // Replace paginator collection
-        $comments->setCollection($transformedData);
-
         return response()->json([
             'status' => true,
             'code' => 200,
             'message' => 'Comments fetched successfully',
-            'data' => $comments->items(), // or $transformedData
+            'data' => $data,
             'pagination' => [
                 'total_page'   => $comments->lastPage(),
                 'per_page'     => $comments->perPage(),
