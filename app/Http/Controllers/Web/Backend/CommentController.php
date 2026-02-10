@@ -53,6 +53,7 @@ class CommentController extends Controller
         $html .= '
         <div class="comment-item level-0">
             <div class="comment-text">' . e($comment->comment) . '</div>
+
         </div>
     ';
 
@@ -159,23 +160,25 @@ class CommentController extends Controller
         ]);
 
 
-               $comment = Comment::where('parent_id', $request->parent_id)
+               $comment = Comment::where('id', $request->parent_id)
                  ->where('news_id', $request->news_id)
-                 ->first();
+                 ->get();
+                 dd($comment->count());
 
 
-        if ($comment) {
+        if ($comment->count() < 1) {
+            dd(123);
             $comment = Comment::create([
                 'user_id' => auth()->id(),
                 'news_id' => $request->news_id,
-                'parent_id' => $comment->id,
+                'parent_id' => $comment->first()->id,
                 'comment' => $request->comment,
             ]);
         } else {
             $comment = Comment::create([
                 'user_id' => auth()->id(),
                 'news_id' => $request->news_id,
-                'parent_id' => $request ->parent_id,
+                'parent_id' => $request->parent_id,
                 'comment' => $request->comment,
             ]);
         }
