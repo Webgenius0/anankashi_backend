@@ -27,6 +27,7 @@ class CommentController extends Controller
             ])
                 ->whereNull('parent_id')
                 ->latest()
+                ->select('id', 'user_id', 'news_id', 'comment', 'created_at')
                 ->get();
 
             return DataTables::of($comments)
@@ -166,7 +167,12 @@ class CommentController extends Controller
                 'comment' => $request->comment,
             ]);
 
-        return response()->json(['message' => 'Comment added successfully', 'comment' => $comment]);
+
+            $replye = Comment::where('parent_id', $request->parent_id)->get();
+
+
+
+        return response()->json(['message' => 'Reply added successfully', 'comment' => $comment]);
     }
 
     public function edit($id)
