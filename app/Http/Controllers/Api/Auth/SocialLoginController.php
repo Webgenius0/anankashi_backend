@@ -70,7 +70,7 @@ class SocialLoginController extends Controller
                     'slug' => Str::slug($socialUser->getName()) . '-' . Str::random(5),
                     'otp_verified_at' => now(),
                 ]);
-                $user->assignRole('user');
+                $user->assignRole('customer');
                 $isNewUser = true;
                 //notify to admin start
                 /* $admins = User::where('role', 'admin')->get();
