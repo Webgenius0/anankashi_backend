@@ -40,7 +40,7 @@ class ResetPasswordController extends Controller
         $user->save();
 
         // Redirect to external page
-        return redirect('https://cryptax-dev.vercel.app/reset-password/verified?email=' .  $user->email . '&token=' . $token);
+        return redirect('https://cryptax-dev.vercel.app/reset-password/verified?email=' . $user->email . '&token=' . $token);
     }
     public function forgotPassword(Request $request)
     {
