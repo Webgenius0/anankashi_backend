@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backend\CryptoStoreController;
 use App\Http\Controllers\Web\Backend\NewsController;
 use App\Http\Controllers\Web\Backend\Access\PermissionController;
 use App\Http\Controllers\Web\Backend\Access\RoleController;
@@ -202,6 +203,16 @@ Route::group(['middleware' => ['web-admin']], function () {
     Route::controller(TransactionController::class)->prefix('transaction')->name('transaction.')->group(function () {
         Route::get('/{user_id?}', 'index')->name('index');
         Route::get('/show/{id}', 'show')->name('show');
+    });
+
+    Route::controller(CryptoStoreController::class)->prefix('crypto-stores')->name('crypto-stores.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/store', 'store')->name('store');
+        Route::get('/show/{id}', 'show')->name('show');
+        Route::get('/edit/{id}', 'edit')->name('edit');
+        Route::PUT('/update/{id}', 'update')->name('update');
+        Route::delete('/delete/{id}', 'destroy')->name('destroy');
     });
 
 

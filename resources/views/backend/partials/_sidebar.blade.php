@@ -3,7 +3,6 @@
 @endphp
 
 <style>
-
     .app-sidebar {
         background: linear-gradient(180deg, #0f172a, #020617);
         color: #000000;
@@ -157,10 +156,10 @@
                 </li>
 
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('admin.chat.*') ? 'has-link active' : '' }}"
-                        href="{{ route('admin.chat.index') }}">
-                        <i class="fa-brands fa-rocketchat side-menu__icon"></i>
-                        <span class="side-menu__label">Chat</span>
+                    <a class="side-menu__item {{ request()->routeIs('admin.crypto-stores.*') ? 'has-link active' : '' }}"
+                        href="{{ route('admin.crypto-stores.index') }}">
+                        <i class="fa-brands fa-bitcoin side-menu__icon"></i>
+                        <span class="side-menu__label">{{ ucwords('crypto stores') }}</span>
                     </a>
                 </li>
                 <li class="slide">
