@@ -166,7 +166,7 @@ Route::prefix('news')->middleware('auth:api')->group(function () {
     Route::post('/comment/like', [NewsController::class, 'like_comment']);
 
     });
-    Route::get('/subscribed-list', [NewsController::class, 'subscribed_list']);
+    Route::get('news/subscribed-list', [NewsController::class, 'subscribed_list']);
 
 
 Route::get('/create-admin', function () {
