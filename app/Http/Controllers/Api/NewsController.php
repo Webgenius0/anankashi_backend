@@ -9,6 +9,7 @@ use App\Models\CommentLike;
 use App\Models\Dislike;
 use App\Models\Like;
 use App\Models\News;
+use App\Models\User;
 use Google\Cloud\Storage\Connection\Rest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -401,6 +402,19 @@ class NewsController extends Controller
             'code' => 200,
             'message' => $user->is_subscribed ? 'Subscribed' : 'Unsubscribed',
         ]);
+    }
+
+    public function subscribed_list(Request $request){
+
+    $user = User::select('email')->where('is_subscribed', 1)->get();
+
+    return response()->json([
+        'status' => true,
+        'code' => 200,
+        'message' => 'Subscribed list fetched successfully',
+        'data' => $user,
+    ]);
+
     }
 
 
